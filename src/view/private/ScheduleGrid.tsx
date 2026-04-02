@@ -9,7 +9,6 @@ type Subject = { id: string; name: string; bgColor: string; textColor: string };
 type PeriodoItem = { id: number; anio: number; activo: number };
 type DocenteItem = { id: number; nombre_completo: string };
 type GradoItem = { id: number; nombre: string };
-type SeccionItem = { id: number; nombre: string };
 type CursoItem = { id: number; nombre: string };
 
 type ReporteRow = {
@@ -83,13 +82,11 @@ export default function ScheduleGrid() {
   const [periodos, setPeriodos] = useState<PeriodoItem[]>([]);
   const [docentes, setDocentes] = useState<DocenteItem[]>([]);
   const [grados, setGrados] = useState<GradoItem[]>([]);
-  const [secciones, setSecciones] = useState<SeccionItem[]>([]);
   const [cursos, setCursos] = useState<CursoItem[]>([]);
 
   const [idPeriodo, setIdPeriodo] = useState<string>("");
   const [idDocente, setIdDocente] = useState<string>("");
   const [idGrado, setIdGrado] = useState<string>("");
-  const [idSeccion, setIdSeccion] = useState<string>("");
 
   const [rows, setRows] = useState<ReporteRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -110,7 +107,6 @@ export default function ScheduleGrid() {
         setPeriodos(periodosData);
         setDocentes(payload.docentes || []);
         setGrados(payload.grados || []);
-        setSecciones(payload.secciones || []);
         setCursos(payload.cursos || []);
 
         const periodoActivo = periodosData.find((p: PeriodoItem) => p.activo === 1);
@@ -134,7 +130,6 @@ export default function ScheduleGrid() {
       if (idPeriodo) params.id_periodo = idPeriodo;
       if (idDocente) params.id_docente = idDocente;
       if (idGrado) params.id_grado = idGrado;
-      if (idSeccion) params.id_seccion = idSeccion;
 
       const { data } = await api.get("/horario/reporte", { params });
       if (!data?.success) {
@@ -263,19 +258,7 @@ export default function ScheduleGrid() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Sección</label>
-              <select
-                className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-sm text-gray-800"
-                value={idSeccion}
-                onChange={(e) => setIdSeccion(e.target.value)}
-              >
-                <option value="">Todos</option>
-                {secciones.map((s) => (
-                  <option key={s.id} value={s.id}>{s.nombre}</option>
-                ))}
-              </select>
-            </div>
+
 
             <button
               onClick={cargarReporte}

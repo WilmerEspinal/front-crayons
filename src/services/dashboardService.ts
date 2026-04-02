@@ -1,6 +1,16 @@
 import api from "@/lib/axios";
 
 // Dashboard API service functions
+export interface PaginatedResult<T> {
+  data: T[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export interface DashboardStats {
   totalStudents: number;
   activeStudents: number;
@@ -97,6 +107,8 @@ export interface DashboardSummaryData {
     pagado: number;
     pendiente: number;
   };
+  recent_payments?: RecentPayment[];
+  debtors?: Debtor[];
 }
 
 export const fetchDashboardStats = async (): Promise<DashboardStats> => {
@@ -117,9 +129,10 @@ export const fetchDashboardStats = async (): Promise<DashboardStats> => {
   };
 };
 
-export const fetchSummaryStats = async (): Promise<DashboardSummaryData | null> => {
+export const fetchSummaryStats = async (anio?: string): Promise<DashboardSummaryData | null> => {
   try {
-    const response = await api.get('/dashboard/estadisticas');
+    const url = anio ? `/dashboard/estadisticas?anio=${anio}` : '/dashboard/estadisticas';
+    const response = await api.get(url);
     if (response.data.success) {
       return response.data.data;
     }
@@ -129,30 +142,11 @@ export const fetchSummaryStats = async (): Promise<DashboardSummaryData | null> 
   }
 };
 
-export const fetchRecentPayments = async (): Promise<RecentPayment[]> => {
-  return [
-    { id: 1, studentName: "María García", amount: 450, date: "2024-10-28", status: "paid", type: "cuota" },
-  ];
-};
-
-export const fetchMonthlyData = async (): Promise<MonthlyData[]> => {
-  return [
-    { month: "Oct", revenue: 28750 },
-  ];
-};
-
 export const fetchDebtorsReport = async (gradeFilter: string = 'Todos', statusFilter: string = 'Todos', yearFilter: string = '2025'): Promise<DebtorReportItem[]> => {
-  const statusMap: Record<string, string> = {
-    'Todos': 'todo',
-    'Deuda': '0',
-    'Al día': '1'
-  };
-
-  const estado = statusMap[statusFilter] || 'todo';
   const idGrado = gradeFilter === 'Todos' ? '0' : gradeFilter;
 
   try {
-    const response = await api.get(`/cuotas/filtro/${yearFilter}/${idGrado}/${estado}`);
+    const response = await api.get(`/cuotas/filtro/${yearFilter}/${idGrado}/todo`);
     const result = response.data;
 
     if (result.status && Array.isArray(result.data)) {
@@ -184,22 +178,38 @@ export const fetchDebtorsReport = async (gradeFilter: string = 'Todos', statusFi
         const estadoUpper = item.estado?.toUpperCase();
 
         if (estadoUpper === 'PENDIENTE' || estadoUpper === 'PARCIAL') {
-          const montoTotal = parseFloat(item.monto);
-          const montoPagado = parseFloat(item.monto_pagado || '0');
-          student.amountOwed += (montoTotal - montoPagado);
+          const fechaVencimiento = new Date(item.fecha_vencimiento);
+          const limitDate = new Date();
+          limitDate.setDate(limitDate.getDate() + 10);
 
-          if (item.tipo?.toLowerCase() === 'cuota') {
-            student.monthsOwed++;
+          if (limitDate >= fechaVencimiento) {
+            const montoTotal = parseFloat(item.monto);
+            const montoPagado = parseFloat(item.monto_pagado || '0');
+            student.amountOwed += (montoTotal - montoPagado);
+
+            if (item.tipo?.toLowerCase() === 'cuota' || item.tipo?.toLowerCase() === 'mensualidad') {
+              student.monthsOwed++;
+            }
+            student.status = 'Deuda';
           }
-          student.status = 'Deuda';
         }
 
-        if (item.fecha_pago && (student.lastPaymentDate === 'Sin pagos' || new Date(item.fecha_pago) > new Date(student.lastPaymentDate))) {
-          student.lastPaymentDate = item.fecha_pago;
+        if (item.fecha_pago) {
+          if (student.lastPaymentDate === 'Sin pagos' || new Date(item.fecha_pago) > new Date(student.lastPaymentDate)) {
+            student.lastPaymentDate = item.fecha_pago;
+          }
         }
       });
 
-      return Array.from(studentMap.values());
+      let finalReport = Array.from(studentMap.values());
+
+      if (statusFilter === 'Deuda') {
+        finalReport = finalReport.filter(s => s.status === 'Deuda');
+      } else if (statusFilter === 'Al día') {
+        finalReport = finalReport.filter(s => s.status === 'Al día');
+      }
+
+      return finalReport;
     }
     return [];
   } catch (error) {
@@ -207,21 +217,21 @@ export const fetchDebtorsReport = async (gradeFilter: string = 'Todos', statusFi
   }
 };
 
-export const fetchDebtors = async (): Promise<Debtor[]> => {
-  const report = await fetchDebtorsReport();
-  return report
-    .filter(item => item.status === 'Deuda')
-    .map(item => ({
-      id: item.id,
-      studentName: item.studentName,
-      months: item.monthsOwed,
-      amount: item.amountOwed
-    }));
-};
 
-export const fetchDailyPayments = async (): Promise<DailyPayment[]> => {
-  // Placeholder for real daily report if exists
-  return [];
+
+export const fetchDailyPayments = async (page: number = 1, limit: number = 5): Promise<PaginatedResult<DailyPayment> | null> => {
+  try {
+    const response = await api.get(`/pago/recientes?page=${page}&limit=${limit}`);
+    if (response.data.success) {
+      return {
+        data: response.data.data,
+        pagination: response.data.pagination
+      };
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
 };
 
 export const fetchGradesList = async (): Promise<Grade[]> => {

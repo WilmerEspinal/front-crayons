@@ -320,6 +320,7 @@ export default function RegisterTeacher() {
 
         // Refetch cursos disponibles usando el queryClient cache
         queryClient.invalidateQueries({ queryKey: ['disponibilidadCursos', currentYear] });
+        queryClient.invalidateQueries({ queryKey: ['docentesList'] });
       }
     } catch (error) {
       showAlert("Error", "Ocurrió un error al registrar al docente. Intente nuevamente.", "danger");

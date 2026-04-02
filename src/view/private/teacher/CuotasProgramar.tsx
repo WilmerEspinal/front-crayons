@@ -169,6 +169,9 @@ export default function CuotasProgramar() {
           if (response.data.success) {
             showAlert("Eliminado", "El periodo fue eliminado correctamente.", "success");
             queryClient.invalidateQueries({ queryKey: ['periodosCuotas'] });
+            queryClient.invalidateQueries({ queryKey: ['periodosA'] });
+            queryClient.invalidateQueries({ queryKey: ['periodosA_anios'] });
+            queryClient.invalidateQueries({ queryKey: ['periodosPromocion'] });
           }
         } catch (error) {
           showAlert("Error", "No se pudo eliminar el periodo.", "danger");
@@ -192,12 +195,18 @@ export default function CuotasProgramar() {
         if (response.data.success) {
           showAlert("Actualizado", "El periodo fue actualizado correctamente.", "success");
           queryClient.invalidateQueries({ queryKey: ['periodosCuotas'] });
+          queryClient.invalidateQueries({ queryKey: ['periodosA'] });
+          queryClient.invalidateQueries({ queryKey: ['periodosA_anios'] });
+          queryClient.invalidateQueries({ queryKey: ['periodosPromocion'] });
         }
       } else {
         const response = await axios.post(`${API_URL}/cuotas/agregar-periodo`, payload);
         if (response.status === 200 || response.status === 201) {
           showAlert("Éxito", "El periodo fue creado correctamente.", "success");
           queryClient.invalidateQueries({ queryKey: ['periodosCuotas'] });
+          queryClient.invalidateQueries({ queryKey: ['periodosA'] });
+          queryClient.invalidateQueries({ queryKey: ['periodosA_anios'] });
+          queryClient.invalidateQueries({ queryKey: ['periodosPromocion'] });
         }
       }
       setIsDialogOpen(false);

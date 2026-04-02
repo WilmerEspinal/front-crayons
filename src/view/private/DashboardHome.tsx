@@ -6,13 +6,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  fetchDebtors,
   fetchSummaryStats,
-  fetchRecentPayments,
+  fetchPeriodsList,
   type RecentPayment,
   type Debtor,
-  type DashboardSummaryData
+  type DashboardSummaryData,
+  type AcademicPeriod
 } from "@/services/dashboardService";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SimpleLineChart } from "@/components/charts/SimpleLineChart";
 import { SimplePieChart } from "@/components/charts/SimplePieChart";
 import {
@@ -32,32 +39,48 @@ export default function DashboardHome() {
   const [recentPayments, setRecentPayments] = useState<RecentPayment[]>([]);
   const [debtors, setDebtors] = useState<Debtor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [periods, setPeriods] = useState<AcademicPeriod[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>("");
 
   useEffect(() => {
-    fetchDashboardData();
+    const initData = async () => {
+      setIsLoading(true);
+      const periodsData = await fetchPeriodsList();
+      setPeriods(periodsData);
+
+      let defaultYear = new Date().getFullYear().toString();
+      if (periodsData && periodsData.length > 0) {
+        const activePeriod = periodsData.find(p => p.activo === 1);
+        if (activePeriod) defaultYear = activePeriod.anio.toString();
+        else defaultYear = periodsData[0].anio.toString();
+      }
+      setSelectedYear(defaultYear);
+      fetchDashboardData(defaultYear);
+    };
+    initData();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (year: string) => {
+    if (!year) return;
     try {
       setIsLoading(true);
-
-      const [summary, paymentsData, debtorsData] = await Promise.all([
-        fetchSummaryStats(),
-        fetchRecentPayments(),
-        fetchDebtors()
-      ]);
+      const summary = await fetchSummaryStats(year);
 
       if (summary) {
         setSummaryData(summary);
+        setRecentPayments(summary.recent_payments || []);
+        setDebtors(summary.debtors || []);
       }
-
-      setRecentPayments(paymentsData);
-      setDebtors(debtorsData);
 
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    fetchDashboardData(year);
   };
 
   const formatCurrency = (amount: number | string) => {
@@ -114,15 +137,33 @@ export default function DashboardHome() {
   return (
     <div className="flex-1 bg-transparent p-6 md:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Resumen General</h1>
           <p className="text-sm text-slate-600 mt-1">Visión global de ingresos, población y estado de pagos.</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-sm text-slate-700 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200">
-          <div className="w-2 h-2 rounded-full bg-emerald-500" />
-          Actualizado: {new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-700">Periodo:</span>
+            <Select value={selectedYear} onValueChange={handleYearChange}>
+              <SelectTrigger className="w-[120px] h-9 bg-white border-slate-200">
+                <SelectValue placeholder="Año" />
+              </SelectTrigger>
+              <SelectContent>
+                {periods.map(p => (
+                  <SelectItem key={p.id} value={p.anio.toString()}>
+                    {p.anio} {p.activo === 1 && '(Activo)'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="hidden md:flex items-center gap-2 text-sm text-slate-700 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            Actualizado: {new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
+
       </div>
 
       {/* KPI Cards */}

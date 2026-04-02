@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import api from "@/lib/axios";
 import axios from 'axios';
-import { Search, User, Calendar, CreditCard, ChevronDown, ChevronRight, FileDown, Printer, Banknote, Loader2, AlertCircle, AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import { Search, User, Calendar, CreditCard, ChevronDown, ChevronRight, FileDown, Banknote, Loader2, AlertCircle, AlertTriangle, CheckCircle2, X, FileSpreadsheet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -28,8 +28,6 @@ import {
   type AcademicPeriod
 } from "@/services/dashboardService";
 import * as XLSX from 'xlsx';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 // Tipos de datos según la respuesta REAL de la API
 interface PagoDetalle {
@@ -65,7 +63,7 @@ interface DatosEstudiante {
   grado: string;
   anio: string;
   resumen: ResumenEstudiante;
-  detalle: (PagoDetalle & { periodo_activo?: number; matricula_estado?: string })[];
+  detalle: (PagoDetalle & { periodo_activo?: number; matricula_estado?: string; alumno_estado?: string })[];
   dni: string;
 }
 
@@ -96,6 +94,8 @@ const CuotasDetalle = () => {
   const [viewMode, setViewMode] = useState<'search' | 'report' | 'daily'>('search');
   const [reportData, setReportData] = useState<DebtorReportItem[]>([]);
   const [dailyPayments, setDailyPayments] = useState<DailyPayment[]>([]);
+  const [totalDailyPages, setTotalDailyPages] = useState(1);
+  const [currentDailyPage, setCurrentDailyPage] = useState(1);
   const [grades, setGrades] = useState<GradeFromService[]>([]);
   const [selectedGrade, setSelectedGrade] = useState<string>("Todos");
   const [selectedStatus, setSelectedStatus] = useState<string>("Deuda");
@@ -134,19 +134,6 @@ const CuotasDetalle = () => {
     });
   };
 
-  // const showConfirm = (title: string, description: string, onConfirm: () => void, type: "info" | "success" | "danger" | "warning" = "info") => {
-  //   setModalConfig({
-  //     isOpen: true,
-  //     title,
-  //     description,
-  //     onConfirm,
-  //     confirmText: "Confirmar",
-  //     cancelText: "Cancelar",
-  //     showCancel: true,
-  //     type
-  //   });
-  // };
-
   // Cargar datos al montar
   useEffect(() => {
     const loadData = async () => {
@@ -179,11 +166,15 @@ const CuotasDetalle = () => {
     }
   };
 
-  const handleLoadDailyReport = async () => {
+  const handleLoadDailyReport = async (page: number = 1) => {
     setIsDailyLoading(true);
     try {
-      const data = await fetchDailyPayments();
-      setDailyPayments(data);
+      const result = await fetchDailyPayments(page);
+      if (result) {
+        setDailyPayments(result.data);
+        setTotalDailyPages(result.pagination.totalPages);
+        setCurrentDailyPage(result.pagination.page);
+      }
     } catch (error) {
     } finally {
       setIsDailyLoading(false);
@@ -204,34 +195,29 @@ const CuotasDetalle = () => {
 
     const ws = XLSX.utils.json_to_sheet(dataToExport);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Reporte_Deudores");
-    XLSX.writeFile(wb, `Reporte_Deudores_${selectedGrade}_${selectedYear}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, "Estado_Pensiones");
+    XLSX.writeFile(wb, `Estado_Pensiones_${selectedGrade}_${selectedYear}.xlsx`);
   };
 
-  const handlePrintReceipt = (payment: DailyPayment) => {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text('RECIBO DE PAGO', 105, 20, { align: 'center' });
-    doc.setFontSize(12);
-    doc.text('Institución Educativa "Mi Cole"', 105, 30, { align: 'center' });
-    doc.text(`N° Recibo: ${payment.receiptNumber}`, 150, 50);
-    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 150, 56);
-    doc.text(`Estudiante: ${payment.studentName}`, 20, 50);
-    doc.text(`DNI: ${payment.dni}`, 20, 56);
+  const handleExportIndividualExcel = (item: DebtorReportItem) => {
+    const dataToExport = item.detalle.map(det => ({
+      'Tipo de Concepto': det.tipo,
+      'Número de Cuota': det.numero_cuota || 'N/A',
+      'Fecha Vencimiento': new Date(det.fecha_vencimiento).toLocaleDateString(),
+      'Monto Programado': parseFloat(det.monto).toFixed(2),
+      'Monto Pagado': parseFloat(det.monto_pagado).toFixed(2),
+      'Estado del Pago': det.estado,
+      'Número Recibo': det.numero_recibo || 'Sin recibo',
+      'Fecha de Pago': det.fecha_pago ? new Date(det.fecha_pago).toLocaleDateString() : 'Pendiente'
+    }));
 
-    autoTable(doc, {
-      startY: 70,
-      head: [['Concepto', 'Método de Pago', 'Importe']],
-      body: [[payment.concept, payment.method, `S/ ${payment.amount.toFixed(2)}`]],
-      theme: 'grid',
-      headStyles: { fillColor: [66, 66, 66] }
-    });
+    const ws = XLSX.utils.json_to_sheet(dataToExport);
+    const wb = XLSX.utils.book_new();
 
-    const finalY = (doc as any).lastAutoTable.finalY + 10;
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text(`TOTAL PAGADO: S/ ${payment.amount.toFixed(2)}`, 140, finalY);
-    doc.save(`Recibo_${payment.receiptNumber}.pdf`);
+    XLSX.utils.book_append_sheet(wb, ws, "Detalle_Pensiones");
+
+    const fileName = `Reporte_${item.studentName.replace(/\s+/g, '_')}_${item.year}.xlsx`;
+    XLSX.writeFile(wb, fileName);
   };
 
   const handleDownloadReceipt = async (id: number) => {
@@ -401,21 +387,21 @@ const CuotasDetalle = () => {
             onClick={() => setViewMode('search')}
             className="rounded-md"
           >
-            Buscar Alumno
+            Gestión por Alumno
           </Button>
           <Button
             variant={viewMode === 'report' ? 'default' : 'ghost'}
             onClick={() => { setViewMode('report'); if (reportData.length === 0) handleSearchReport(); }}
             className="rounded-md"
           >
-            Reporte Deudores
+            Estado de Pensiones
           </Button>
           <Button
             variant={viewMode === 'daily' ? 'default' : 'ghost'}
-            onClick={() => { setViewMode('daily'); if (dailyPayments.length === 0) handleLoadDailyReport(); }}
+            onClick={() => { setViewMode('daily'); handleLoadDailyReport(1); }}
             className="rounded-md"
           >
-            Pagos del Día
+            Últimos Pagos
           </Button>
         </div>
       </div>
@@ -485,8 +471,10 @@ const CuotasDetalle = () => {
                       <p className="text-gray-500 font-medium">{datosEstudiante.grado}</p>
                       <div className="flex flex-wrap justify-center gap-2 mt-2">
                         <Badge variant="outline">DNI: {datosEstudiante.dni}</Badge>
-                        {datosEstudiante.detalle[0]?.matricula_estado === 'Retirado' && (
-                          <Badge variant="destructive" className="animate-pulse">RETIRADO</Badge>
+                        {datosEstudiante.detalle[0]?.alumno_estado !== 'Activo' && (
+                          <Badge variant="destructive" className="animate-pulse">
+                            {datosEstudiante.detalle[0]?.alumno_estado?.toUpperCase() || 'INACTIVO'}
+                          </Badge>
                         )}
                         {datosEstudiante.detalle[0]?.periodo_activo === 0 && (
                           <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">PERIODO INACTIVO</Badge>
@@ -494,12 +482,12 @@ const CuotasDetalle = () => {
                       </div>
                     </div>
 
-                    {(datosEstudiante.detalle[0]?.periodo_activo === 0 || datosEstudiante.detalle[0]?.matricula_estado === 'Retirado') && (
+                    {(datosEstudiante.detalle[0]?.periodo_activo === 0 || datosEstudiante.detalle[0]?.alumno_estado !== 'Activo') && (
                       <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-2">
                         <div className="mt-0.5">⚠️</div>
                         <p>
-                          {datosEstudiante.detalle[0]?.matricula_estado === 'Retirado'
-                            ? 'Este estudiante figura como Retirado. Los cobros manuales están deshabilitados.'
+                          {datosEstudiante.detalle[0]?.alumno_estado !== 'Activo'
+                            ? `Este estudiante figura como ${datosEstudiante.detalle[0]?.alumno_estado || 'Inactivo'}. Los cobros manuales están deshabilitados.`
                             : 'El periodo académico está inactivo. Solo se pueden registrar pagos en periodos activos.'}
                         </p>
                       </div>
@@ -538,7 +526,7 @@ const CuotasDetalle = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              disabled={matriculaInfo.periodo_activo === 0 || matriculaInfo.matricula_estado === 'Retirado'}
+                              disabled={matriculaInfo.periodo_activo === 0 || matriculaInfo.alumno_estado !== 'Activo'}
                               onClick={() => {
                                 setMontoPagadoReq(matriculaInfo.monto);
                                 setMetodoPago('Efectivo');
@@ -606,7 +594,7 @@ const CuotasDetalle = () => {
                                     variant="ghost"
                                     size="sm"
                                     className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 disabled:opacity-30"
-                                    disabled={cuota.periodo_activo === 0 || cuota.matricula_estado === 'Retirado'}
+                                    disabled={cuota.periodo_activo === 0 || cuota.alumno_estado !== 'Activo'}
                                     onClick={() => {
                                       setCuotaSeleccionada(cuota);
                                       setMontoPagadoReq(cuota.monto);
@@ -653,7 +641,7 @@ const CuotasDetalle = () => {
           <Card className="border-none shadow-md bg-white">
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
-                <span>Reporte de Deudores {selectedYear}</span>
+                <span>Estado de Pensiones {selectedYear}</span>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={handleExportExcel} disabled={reportData.length === 0}>
                     <FileDown className="h-4 w-4 mr-2" />
@@ -740,10 +728,21 @@ const CuotasDetalle = () => {
                             <TableCell>
                               {expandedStudent === item.dni ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                             </TableCell>
-                            <TableCell className="font-medium">
+                            <TableCell className="font-medium p-2">
                               <div className="flex flex-col">
-                                <span>{item.studentName}</span>
-                                <span className="text-xs text-gray-500">{item.dni}</span>
+                                <div className="flex items-center gap-2">
+                                  <span>{item.studentName}</span>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    onClick={(e) => { e.stopPropagation(); handleExportIndividualExcel(item); }}
+                                    title="Exportar cuotas de este alumno"
+                                  >
+                                    <FileSpreadsheet className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                                <span className="text-[10px] text-slate-400 font-mono">{item.dni}</span>
                               </div>
                             </TableCell>
                             <TableCell>{item.grade}</TableCell>
@@ -821,11 +820,11 @@ const CuotasDetalle = () => {
       )}
 
       {viewMode === 'daily' && (
-        <Card className="border-none shadow-md">
+        <Card className="border-none shadow-md bg-white">
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
-              <span>Pagos Registrados Hoy</span>
-              <Button size="sm" onClick={handleLoadDailyReport} disabled={isDailyLoading}>
+              <span>Últimos Pagos Registrados</span>
+              <Button variant="default" size="sm" onClick={() => handleLoadDailyReport(currentDailyPage)} disabled={isDailyLoading}>
                 Actualizar
               </Button>
             </CardTitle>
@@ -851,20 +850,22 @@ const CuotasDetalle = () => {
                       <TableCell className="font-mono text-xs">{p.receiptNumber}</TableCell>
                       <TableCell>{p.studentName}</TableCell>
                       <TableCell>{p.concept}</TableCell>
-                      <TableCell>{p.time}</TableCell>
+                      <TableCell className="text-gray-500 text-xs font-mono">
+                        {new Date(p.time).toLocaleString('es-ES', {
+                          day: '2-digit', month: '2-digit', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit'
+                        })}
+                      </TableCell>
                       <TableCell className="font-bold">S/ {p.amount.toFixed(2)}</TableCell>
                       <TableCell className="text-right">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                          className="bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 h-8"
                           onClick={() => handleDownloadReceipt(p.id)}
                         >
-                          <FileDown className="h-4 w-4 mr-1" />
+                          <FileDown className="h-3.5 w-3.5 mr-1" />
                           Constancia PDF
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handlePrintReceipt(p)}>
-                          <Printer className="h-4 w-4" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -874,6 +875,32 @@ const CuotasDetalle = () => {
                 )}
               </TableBody>
             </Table>
+
+            {totalDailyPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-6 pt-6 border-t font-sans">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentDailyPage <= 1 || isDailyLoading}
+                  onClick={() => handleLoadDailyReport(currentDailyPage - 1)}
+                  className="rounded-lg h-9 px-4 border-slate-200"
+                >
+                  Anterior
+                </Button>
+                <div className="text-sm text-slate-600 font-medium whitespace-nowrap">
+                  Página <span className="text-blue-600">{currentDailyPage}</span> de {totalDailyPages}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentDailyPage >= totalDailyPages || isDailyLoading}
+                  onClick={() => handleLoadDailyReport(currentDailyPage + 1)}
+                  className="rounded-lg h-9 px-4 border-slate-200"
+                >
+                  Siguiente
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
