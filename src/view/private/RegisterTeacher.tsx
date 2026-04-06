@@ -241,6 +241,7 @@ export default function RegisterTeacher() {
           nombres: d.first_name || d.nombres || d.nombre || "",
           apellido_paterno: d.first_last_name || d.apellidoPaterno || "",
           apellido_materno: d.second_last_name || d.apellidoMaterno || "",
+          dni: d.numeroDocumento ? d.numeroDocumento.toString() : prev.dni
         }));
         setSuccessMessage(null);
       }
@@ -381,6 +382,7 @@ export default function RegisterTeacher() {
                 </Label>
                 <Input
                   name="dni"
+                  type="number"
                   value={formData.dni}
                   onChange={handleInputChange}
                   placeholder="Número de documento"
@@ -495,6 +497,7 @@ export default function RegisterTeacher() {
                 </Label>
                 <Input
                   name="telefono"
+                  type="number"
                   value={formData.telefono}
                   onChange={handleInputChange}
                   placeholder="999888777"

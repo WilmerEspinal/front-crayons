@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import clsx from "clsx";
 import axios, { AxiosError } from "axios";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileText, RefreshCw, Loader2, Search, CheckCircle2, ChevronLeft } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -115,6 +115,7 @@ interface ErrorResponse {
 }
 
 export default function RegisterStudent() {
+  const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
   const [activeTab, setActiveTab] = useState<'padre' | 'madre'>('padre');
   const [loading, setLoading] = useState(false);
@@ -244,7 +245,7 @@ export default function RegisterStudent() {
         setFormData(prev => ({
           ...prev,
           // Alumno
-          alumno_dni: student.numero_documento || prev.alumno_dni,
+          alumno_dni: student.numero_documento ? student.numero_documento.toString() : prev.alumno_dni,
           alumno_nombre: student.nombres || prev.alumno_nombre,
           alumno_ap_p: student.apellido_paterno || prev.alumno_ap_p,
           alumno_ap_m: student.apellido_materno || prev.alumno_ap_m,
@@ -254,6 +255,7 @@ export default function RegisterStudent() {
           alumno_direccion: student.lugar_nacimiento ? `${student.lugar_nacimiento.departamento}, ${student.lugar_nacimiento.provincia}, ${student.lugar_nacimiento.distrito}` : prev.alumno_direccion,
 
           // Padre
+          padre_dni: padre.numero_documento ? padre.numero_documento.toString() : prev.padre_dni,
           padre_nombre: padre.nombres || prev.padre_nombre,
           padre_ap_p: padre.apellido_paterno || prev.padre_ap_p,
           padre_ap_m: padre.apellido_materno || prev.padre_ap_m,
@@ -261,6 +263,7 @@ export default function RegisterStudent() {
           padre_ocupacion: padre.ocupacion || prev.padre_ocupacion,
 
           // Madre
+          madre_dni: madre.numero_documento ? madre.numero_documento.toString() : prev.madre_dni,
           madre_nombre: madre.nombres || prev.madre_nombre,
           madre_ap_p: madre.apellido_paterno || prev.madre_ap_p,
           madre_ap_m: madre.apellido_materno || prev.madre_ap_m,
@@ -459,7 +462,7 @@ export default function RegisterStudent() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked :
-      type === "number" ? Number(value) : value;
+      (type === "number" && !name.includes('dni') && !name.includes('telefono')) ? Number(value) : value;
 
     setFormData(prev => {
       const newFormData = {
@@ -806,6 +809,9 @@ export default function RegisterStudent() {
         isError: false,
       });
 
+      // Invalidate the students list query to ensure it refetches fresh data
+      queryClient.invalidateQueries({ queryKey: ['studentsList'] });
+
       // Mostrar credenciales generadas para los padres
       if (response.data.data) {
         const { usuarios_padres } = response.data.data;
@@ -986,7 +992,7 @@ export default function RegisterStudent() {
               {/* DNI + Buscar */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                  {renderInput("alumno_dni", "DNI del Alumno")}
+                  {renderInput("alumno_dni", "DNI del Alumno", "number")}
                 </div>
                 <div className="flex items-end">
                   <Button
@@ -1076,7 +1082,7 @@ export default function RegisterStudent() {
                     DNI <span className="text-red-500"> *</span>
                   </Label>
                   <Input
-                    type="text"
+                    type="number"
                     placeholder="Número de documento"
                     className={clsx(
                       "mt-1 h-9",
@@ -1173,7 +1179,7 @@ export default function RegisterStudent() {
                     Teléfono <span className="text-red-500"> *</span>
                   </Label>
                   <Input
-                    type="tel"
+                    type="number"
                     placeholder="900 000 000"
                     className={clsx(
                       "mt-1 h-9",

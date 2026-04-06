@@ -63,7 +63,7 @@ for (let h = 7; h < 17; h++) {
   HORAS.push(`${String(h).padStart(2, "0")}:45`);
 }
 
-const PX_PER_SLOT = 22;
+const PX_PER_SLOT = 18;
 const START_MIN = 7 * 60; // 07:00
 
 const toMin = (h: string) => {
@@ -77,6 +77,77 @@ const timeToPx = (start: string, end: string) =>
   Math.max(((toMin(end) - toMin(start)) / 15) * PX_PER_SLOT, 1);
 
 const TOTAL_H = (HORAS.length - 1) * PX_PER_SLOT;
+
+const resolverConflictos = (bloques: any[]) => {
+  const gruposPorDia = bloques.reduce((acc, bloque) => {
+    if (!acc[bloque.dia]) acc[bloque.dia] = [];
+    acc[bloque.dia].push({
+      ...bloque,
+      startMins: toMin(bloque.horaInicio),
+      endMins: toMin(bloque.horaFin)
+    });
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  const bloquesResueltos: any[] = [];
+
+  Object.keys(gruposPorDia).forEach(dia => {
+    let bloquesDelDia = gruposPorDia[dia];
+    bloquesDelDia.sort((a: any, b: any) => {
+      if (a.startMins === b.startMins) return b.endMins - a.endMins;
+      return a.startMins - b.startMins;
+    });
+
+    let clusters: any[][] = [];
+    if (bloquesDelDia.length > 0) {
+      let clusterActual = [bloquesDelDia[0]];
+      let maxEndMins = bloquesDelDia[0].endMins;
+
+      for (let i = 1; i < bloquesDelDia.length; i++) {
+        const bloque = bloquesDelDia[i];
+        if (bloque.startMins < maxEndMins) {
+          clusterActual.push(bloque);
+          maxEndMins = Math.max(maxEndMins, bloque.endMins);
+        } else {
+          clusters.push(clusterActual);
+          clusterActual = [bloque];
+          maxEndMins = bloque.endMins;
+        }
+      }
+      clusters.push(clusterActual);
+    }
+
+    clusters.forEach(cluster => {
+      let columnas: any[][] = [];
+      cluster.forEach(bloque => {
+        let acomodado = false;
+        for (let j = 0; j < columnas.length; j++) {
+          const columna = columnas[j];
+          const ultimoEnColumna = columna[columna.length - 1];
+          if (bloque.startMins >= ultimoEnColumna.endMins) {
+            columna.push(bloque);
+            acomodado = true;
+            break;
+          }
+        }
+        if (!acomodado) {
+          columnas.push([bloque]);
+        }
+      });
+
+      const totalColumnas = columnas.length;
+      columnas.forEach((columna, colIndex) => {
+        columna.forEach(bloque => {
+          bloque.colWidth = 100 / totalColumnas;
+          bloque.colLeft = (100 / totalColumnas) * colIndex;
+          bloquesResueltos.push(bloque);
+        });
+      });
+    });
+  });
+
+  return bloquesResueltos;
+};
 
 export default function ScheduleGrid() {
   const [periodos, setPeriodos] = useState<PeriodoItem[]>([]);
@@ -197,7 +268,9 @@ export default function ScheduleGrid() {
       };
     });
 
-    return { TEACHERS: tMap, SUBJECTS: sMap, blocks: mappedBlocks };
+    const bloquesResueltos = resolverConflictos(mappedBlocks);
+
+    return { TEACHERS: tMap, SUBJECTS: sMap, blocks: bloquesResueltos };
   }, [rows, docentes, cursos]);
 
   return (
@@ -237,7 +310,7 @@ export default function ScheduleGrid() {
                 value={idDocente}
                 onChange={(e) => setIdDocente(e.target.value)}
               >
-                <option value="">Todos</option>
+                <option value="" disabled>Seleccione un docente...</option>
                 {docentes.map((d) => (
                   <option key={d.id} value={d.id}>{d.nombre_completo}</option>
                 ))}
@@ -262,7 +335,11 @@ export default function ScheduleGrid() {
 
             <button
               onClick={cargarReporte}
-              className="bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold flex items-center justify-center gap-2 py-2 px-4 rounded-md h-[38px] w-full"
+              disabled={!idDocente}
+              className={`${!idDocente
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+                } transition-colors text-white font-semibold flex items-center justify-center gap-2 py-2 px-4 rounded-md h-[38px] w-full`}
             >
               <Filter className="w-4 h-4" />
               Filtrar
@@ -280,7 +357,7 @@ export default function ScheduleGrid() {
         ) : !searched ? (
           <div className="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow-md border border-gray-200 text-center">
             <CalendarDays className="w-12 h-12 text-gray-300 mb-4" />
-            <p className="text-gray-500 font-medium">Filtre por un Docente o Grado y Sección para visualizar la matriz del horario.</p>
+            <p className="text-gray-500 font-medium">Seleccione al menos un docente para visualizar la matriz del horario.</p>
           </div>
         ) : blocks.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow-md border border-gray-200 text-center">
@@ -289,11 +366,11 @@ export default function ScheduleGrid() {
         ) : (
           <>
             <div className="bg-white border rounded-[16px] shadow-sm overflow-hidden" style={{ border: "1px solid #f1f5f9" }}>
-              <div style={{ overflowX: "auto" }}>
-                <div style={{ minWidth: "800px", padding: "16px" }}>
+              <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "65vh" }}>
+                <div style={{ minWidth: "800px", padding: "0 16px 16px 16px" }}>
 
                   {/* Headers */}
-                  <div style={{ display: "flex", borderBottom: "1px solid #f1f5f9", position: "sticky", top: 0, zIndex: 10, background: "#fff", paddingBottom: "12px" }}>
+                  <div style={{ display: "flex", borderBottom: "1px solid #f1f5f9", position: "sticky", top: 0, zIndex: 30, background: "#fff", paddingTop: "16px", paddingBottom: "12px" }}>
                     <div style={{ width: 60, flexShrink: 0 }} />
                     {DIAS.map((dia, di) => (
                       <div key={dia} style={{ flex: 1, textAlign: "center", borderLeft: "1px solid #e2e8f0" }}>
@@ -359,8 +436,8 @@ export default function ScheduleGrid() {
                                   className={`${b.bgColor} ${b.textColor} absolute shadow hover:brightness-110 transition-colors duration-200 border-l-4 ${b.borderColor}`}
                                   style={{
                                     top,
-                                    left: 4,
-                                    right: 4,
+                                    left: `calc(${b.colLeft}% + 4px)`,
+                                    width: `calc(${b.colWidth}% - 8px)`,
                                     height: height - 2,
                                     borderRadius: "4px 8px 8px 4px",
                                     zIndex: 2,
@@ -377,7 +454,7 @@ export default function ScheduleGrid() {
                                     </span>
                                     {b.grado && b.seccion && (
                                       <span className="text-[9px] opacity-80 font-bold uppercase">
-                                        {b.grado} {b.seccion}
+                                        {b.grado}
                                       </span>
                                     )}
                                   </div>

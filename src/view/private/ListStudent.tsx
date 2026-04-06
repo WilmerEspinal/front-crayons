@@ -67,7 +67,7 @@ export default function ListStudent() {
   const limit = 10;
 
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState<{ year: string; grade: string } | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<{ year: string; grade: string } | null>({ year: "2026", grade: "3" });
   const [updateMessage, setUpdateMessage] = useState<{
     text: string;
     isSuccess: boolean;
@@ -159,7 +159,7 @@ export default function ListStudent() {
     },
     enabled: !!appliedFilters,
     placeholderData: keepPreviousData,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   const students = studentsResponse?.data ?? EMPTY_ARRAY;
@@ -387,7 +387,16 @@ export default function ListStudent() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredStudents.length === 0 ? (
+            {loading && students.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                    <p className="text-sm text-slate-500">Cargando estudiantes...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : filteredStudents.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-4">
                   {dniSearch.trim() !== ""
