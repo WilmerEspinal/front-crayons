@@ -116,6 +116,7 @@ export default function ScheduleAssignment() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Estado de selección en el calendario
   // startSlot = índice del slot donde se hizo el PRIMER clic
@@ -388,6 +389,28 @@ export default function ScheduleAssignment() {
     } finally { setLoading(false); }
   };
 
+  const handleDeleteHorario = async (idHorario: number) => {
+    setDeletingId(idHorario);
+    setMessage(null);
+    try {
+      const { data: res } = await api.delete(`/horario/${idHorario}`);
+      if (res?.success) {
+        setMessage({ text: "Bloque eliminado correctamente.", isError: false });
+        // Refrescar registros
+        const [resDoc, resGrad] = await Promise.all([
+          api.get("/horario/reporte", { params: { id_docente: idDocente, id_periodo: idPeriodo } }),
+          api.get("/horario/reporte", { params: { id_grado: idGrado, id_periodo: idPeriodo } })
+        ]);
+        if (resDoc.data?.success) setRegistrados(resDoc.data.data || []);
+        if (resGrad.data?.success) setRegistradosGrado(resGrad.data.data || []);
+      } else {
+        setMessage({ text: res?.message || "No se pudo eliminar.", isError: true });
+      }
+    } catch (e: any) {
+      setMessage({ text: e?.response?.data?.message || "Error al eliminar.", isError: true });
+    } finally { setDeletingId(null); }
+  };
+
   const sel: React.CSSProperties = { width: "100%", appearance: "none", background: "#f9fafb", border: "1px solid #e2e8f0", color: "#1e293b", fontSize: "14px", fontWeight: 600, borderRadius: "12px", padding: "12px 16px", outline: "none", cursor: "pointer", boxSizing: "border-box", transition: "all 0.2s" };
   const inp: React.CSSProperties = { ...sel };
   const lbl: React.CSSProperties = { fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b", marginBottom: "6px", display: "block" };
@@ -639,20 +662,52 @@ export default function ScheduleAssignment() {
 
             {/* Bottom: Clases Registradas */}
             <div style={{ marginTop: 28, borderTop: "1px solid #f1f5f9", paddingTop: 20 }}>
-              <p style={{ margin: "0 0 16px", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#94a3b8" }}>CLASES REGISTRADAS</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {ocupados.length === 0 ? (
-                  <p style={{ margin: 0, fontSize: 13, color: "#cbd5e1", fontStyle: "italic" }}>No hay registros previos para este período</p>
-                ) : (
-                  ocupados.map((o, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", border: "1px solid #f1f5f9", padding: "6px 12px", borderRadius: "100px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
-                      <span style={{ width: 6, height: 6, background: o.isGradoConflict ? "#f59e0b" : "#10b981", borderRadius: "50%" }} />
-                      <span style={{ fontSize: "12px", fontWeight: 700, color: "#334155" }}>{o.dia} · {o.curso}</span>
-                      <span style={{ fontSize: "11px", color: "#94a3b8" }}>{o.horaInicio.slice(0, 5)}-{o.horaFin.slice(0, 5)}</span>
-                    </div>
-                  ))
-                )}
-              </div>
+              <p style={{ margin: "0 0 16px", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#94a3b8" }}>HORARIOS REGISTRADOS DEL DOCENTE</p>
+
+              {registrados.length === 0 ? (
+                <p style={{ margin: 0, fontSize: 13, color: "#cbd5e1", fontStyle: "italic" }}>No hay registros previos para este período</p>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+                        {["Grado", "Curso", "Día", "Inicio", "Fin", "Aula", ""].map(h => (
+                          <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, color: "#64748b", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {registrados.map((r, i) => (
+                        <tr key={r.id_horario} style={{ borderBottom: "1px solid #f1f5f9", background: i % 2 === 0 ? "#fff" : "#fcfcfc" }}>
+                          <td style={{ padding: "8px 12px", color: "#334155", fontWeight: 600 }}>{r.grado}</td>
+                          <td style={{ padding: "8px 12px", color: "#334155" }}>{r.curso}</td>
+                          <td style={{ padding: "8px 12px", color: "#334155" }}>{r.dia_semana}</td>
+                          <td style={{ padding: "8px 12px", color: "#334155", fontFamily: "monospace" }}>{r.hora_inicio.slice(0, 5)}</td>
+                          <td style={{ padding: "8px 12px", color: "#334155", fontFamily: "monospace" }}>{r.hora_fin.slice(0, 5)}</td>
+                          <td style={{ padding: "8px 12px", color: "#94a3b8" }}>{r.aula || "—"}</td>
+                          <td style={{ padding: "8px 12px" }}>
+                            <button
+                              onClick={() => handleDeleteHorario(r.id_horario)}
+                              disabled={deletingId === r.id_horario}
+                              title="Eliminar bloque"
+                              style={{
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                width: 28, height: 28, background: "#fef2f2", border: "1px solid #fecaca",
+                                borderRadius: 6, cursor: deletingId === r.id_horario ? "not-allowed" : "pointer",
+                                color: "#ef4444", opacity: deletingId === r.id_horario ? 0.5 : 1,
+                              }}
+                            >
+                              {deletingId === r.id_horario
+                                ? <Loader2 style={{ width: 12, height: 12, animation: "spin 1s linear infinite" }} />
+                                : <Trash2 style={{ width: 12, height: 12 }} />}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </div>

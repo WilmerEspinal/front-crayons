@@ -39,7 +39,7 @@ import CuotasDetalle from "@/view/private/CuotasDetalle";
 import DashboardHome from "@/view/private/DashboardHome";
 
 import JustificacionesDocente from "@/view/private/teacher/JustificacionesDocente";
-import ReporteAsistenciaClases from "@/view/private/teacher/ReporteAsistenciaClases";
+import DirectorReporteAsistencia from "@/view/private/teacher/ReporteAsistenciaClases";
 import AsistenciaBloquesDocente from "@/view/private/teacher/AsistenciaBloquesDocente";
 import ReporteAsistenciaBloques from "@/view/private/teacher/ReporteAsistenciaBloques";
 import ScheduleAssignment from "@/view/private/ScheduleAssignment";
@@ -96,6 +96,7 @@ const router = createBrowserRouter([
       { path: "promocion-alumnos", element: <StudentPromotions /> },
       { path: "asignar-horarios", element: <ScheduleAssignment /> },
       { path: "ver-horarios", element: <ScheduleGrid /> },
+      { path: "reporte-asistencia", element: <DirectorReporteAsistencia /> },
 
     ],
   },
@@ -110,7 +111,6 @@ const router = createBrowserRouter([
       { index: true, element: <TeacherHome /> },
       { path: "registrar-asistencia", element: <AsistenciaBloquesDocente /> },
       { path: "ver-asistencia", element: <HistorialAsistencia /> },
-      { path: "reporte-clases", element: <ReporteAsistenciaClases /> },
       { path: "justificaciones", element: <JustificacionesDocente /> },
       { path: "reportes-bloques", element: <ReporteAsistenciaBloques /> },
       { path: "mi-horario", element: <MySchedule /> },

@@ -583,7 +583,7 @@ const CuotasDetalle = () => {
                           cuotasMensuales.map((cuota) => (
                             <TableRow key={cuota.id} className="hover:bg-gray-50 transition-colors">
                               <TableCell className="font-medium">Cuota {cuota.numero_cuota}</TableCell>
-                              <TableCell className="text-gray-600">
+                              <TableCell className={new Date(cuota.fecha_vencimiento) < new Date(new Date().setHours(0, 0, 0, 0)) && !cuota.estado.toUpperCase().includes('PAGAD') ? 'text-red-600 font-semibold' : 'text-gray-600'}>
                                 {new Date(cuota.fecha_vencimiento).toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
                               </TableCell>
                               <TableCell className="font-mono font-medium">S/ {parseFloat(cuota.monto).toFixed(2)}</TableCell>
@@ -780,7 +780,9 @@ const CuotasDetalle = () => {
                                         <TableRow key={det.id} className="text-xs hover:bg-gray-50">
                                           <TableCell className="font-medium">{det.tipo}</TableCell>
                                           <TableCell>{det.numero_cuota || '-'}</TableCell>
-                                          <TableCell>{new Date(det.fecha_vencimiento).toLocaleDateString()}</TableCell>
+                                          <TableCell className={new Date(det.fecha_vencimiento) < new Date(new Date().setHours(0, 0, 0, 0)) && !det.estado.toUpperCase().includes('PAGAD') ? 'text-red-600 font-semibold' : ''}>
+                                            {new Date(det.fecha_vencimiento).toLocaleDateString()}
+                                          </TableCell>
                                           <TableCell>S/ {parseFloat(det.monto).toFixed(2)}</TableCell>
                                           <TableCell>S/ {parseFloat(det.monto_pagado).toFixed(2)}</TableCell>
                                           <TableCell>{getEstadoBadge(det.estado)}</TableCell>

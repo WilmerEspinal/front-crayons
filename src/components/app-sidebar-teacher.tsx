@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   History,
-  FileText,
   ShieldCheck,
   LogOut,
   UserCheck,
@@ -35,7 +34,6 @@ export function AppSidebarTeacher({
   const menuItems = [
     { id: 'registro', label: 'Registro Asistencia', icon: UserCheck, url: 'registrar-asistencia' },
     { id: 'historial', label: 'Historial General', icon: History, url: 'ver-asistencia' },
-    { id: 'reporte', label: 'Reporte Diario', icon: FileText, url: 'reporte-clases' },
     { id: 'justificaciones', label: 'Justificaciones', icon: ShieldCheck, url: 'justificaciones' },
     { id: 'horario', label: 'Mi Horario', icon: Calendar, url: 'mi-horario' },
   ];

@@ -89,10 +89,19 @@ export interface DashboardSummaryData {
     ingresos_mensuales: string;
     ingresos_mes_anterior: string;
     estudiantes_activos: number;
+    estudiantes_inactivos: number;
+    docentes_activos: number;
+    docentes_inactivos: number;
+    asistencia_hoy_presentes: number;
+    asistencia_hoy_ausentes: number;
+    asistencia_hoy_evaluados: number;
     pagos_pendientes: string;
     estudiantes_con_deuda: number;
     tasa_recaudacion: number;
     meta_mensual: number;
+    monto_esperado_mes: string;
+    monto_esperado_anio: string;
+    periodo_activo: number;
   };
   distribucion_sexo: {
     sexo: string;

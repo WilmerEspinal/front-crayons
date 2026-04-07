@@ -88,6 +88,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: "Gestión de Grados",
             url: "/dashboard/promocion-alumnos",
           },
+          {
+            title: "Reporte de Asistencia",
+            url: "/dashboard/reporte-asistencia",
+          },
         ],
       },
       {
