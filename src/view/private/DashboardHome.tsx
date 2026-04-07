@@ -8,7 +8,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend
+  XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, CreditCard,
@@ -208,7 +208,7 @@ export default function DashboardHome() {
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B' }} dy={10} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={(val) => `S/ ${val}`} />
                     <RechartsTooltip
-                      formatter={(value: number) => [formatCurrency(value), "Recaudación"]}
+                      formatter={(value: any) => [formatCurrency(value), "Recaudación"]}
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     />
                     <Line type="monotone" dataKey="Recaudación" stroke="#2563EB" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
@@ -241,7 +241,7 @@ export default function DashboardHome() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <RechartsTooltip formatter={(value: number) => formatCurrency(value)} />
+                  <RechartsTooltip formatter={(value: any) => formatCurrency(value)} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
