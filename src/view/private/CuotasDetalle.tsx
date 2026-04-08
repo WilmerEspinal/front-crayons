@@ -108,6 +108,7 @@ const CuotasDetalle = () => {
   // Paginación para el reporte de estados
   const [currentReportPage, setCurrentReportPage] = useState(1);
   const [rowsPerPage] = useState(10);
+  const [hasSearchedReport, setHasSearchedReport] = useState(false);
 
   // Custom Modal State
   const [modalConfig, setModalConfig] = useState<{
@@ -160,6 +161,7 @@ const CuotasDetalle = () => {
 
   const handleSearchReport = async () => {
     setIsReportLoading(true);
+    setHasSearchedReport(true);
     setExpandedStudent(null);
     try {
       const data = await fetchDebtorsReport(selectedGrade, selectedStatus, selectedYear);
@@ -396,7 +398,7 @@ const CuotasDetalle = () => {
           </Button>
           <Button
             variant={viewMode === 'report' ? 'default' : 'ghost'}
-            onClick={() => { setViewMode('report'); if (reportData.length === 0) handleSearchReport(); }}
+            onClick={() => setViewMode('report')}
             className="rounded-md"
           >
             Estado de Pensiones
@@ -417,7 +419,7 @@ const CuotasDetalle = () => {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl flex items-center gap-2">
                 <Search className="h-5 w-5 text-blue-600" />
-                Buscar Registro de Estudiante
+                Ver Registro de Estudiante
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -456,7 +458,7 @@ const CuotasDetalle = () => {
                   disabled={isLoading}
                   className="h-9 px-8 bg-blue-600 hover:bg-blue-700"
                 >
-                  {isLoading ? 'Buscando...' : 'Buscar Alumno'}
+                  {isLoading ? 'Cargando...' : 'Ver Alumno'}
                 </Button>
               </div>
             </CardContent>
@@ -652,9 +654,6 @@ const CuotasDetalle = () => {
                     <FileDown className="h-4 w-4 mr-2" />
                     Excel
                   </Button>
-                  <Button size="sm" onClick={handleSearchReport} disabled={isReportLoading}>
-                    {isReportLoading ? 'Buscando...' : 'Actualizar'}
-                  </Button>
                 </div>
               </CardTitle>
             </CardHeader>
@@ -686,6 +685,7 @@ const CuotasDetalle = () => {
                       <SelectValue placeholder="Seleccionar grado" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="Todos">Todos los grados</SelectItem>
                       {grades.map(grade => (
                         <SelectItem key={grade.id} value={grade.id.toString()}>{grade.nombre}</SelectItem>
                       ))}
@@ -704,6 +704,20 @@ const CuotasDetalle = () => {
                       <SelectItem value="Al día">Al día</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    className="h-9 w-full bg-blue-600 hover:bg-blue-700"
+                    onClick={handleSearchReport}
+                    disabled={isReportLoading}
+                  >
+                    {isReportLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Cargando...
+                      </>
+                    ) : 'Ver'}
+                  </Button>
                 </div>
               </div>
 
@@ -816,7 +830,13 @@ const CuotasDetalle = () => {
                         </Fragment>
                       ))
                     ) : (
-                      <TableRow><TableCell colSpan={7} className="h-32 text-center">No se encontraron resultados</TableCell></TableRow>
+                      <TableRow>
+                        <TableCell colSpan={7} className="h-32 text-center text-slate-500">
+                          {hasSearchedReport
+                            ? "No se encontraron resultados para los filtros seleccionados."
+                            : "Seleccione los filtros y haga clic en Ver para cargar los datos."}
+                        </TableCell>
+                      </TableRow>
                     )}
                   </TableBody>
                 </Table>

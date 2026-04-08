@@ -268,7 +268,7 @@ export default function ListTeacher() {
               }}
             >
               {isLoading ? <Loader2 style={{ width: 14, height: 14 }} className="animate-spin" /> : null}
-              Buscar
+              Ver
             </button>
           </div>
         </div>
@@ -305,7 +305,7 @@ export default function ListTeacher() {
           </div>
         ) : docentes.length === 0 ? (
           <div style={{ padding: "40px", textAlign: "center", color: "#374151", fontSize: 13 }}>
-            {appliedAnio ? "No hay docentes registrados para este período." : "Selecciona un año y haz clic en Buscar."}
+            {appliedAnio ? "No hay docentes registrados para este período." : "Selecciona un año y haz clic en Ver."}
           </div>
         ) : (
           docentes.map((docente, idx) => {

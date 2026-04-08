@@ -60,14 +60,14 @@ const EMPTY_ARRAY: any[] = [];
 export default function ListStudent() {
   const queryClient = useQueryClient();
   const [year, setYear] = useState("2026");
-  const [grade, setGrade] = useState("3");
+  const [grade, setGrade] = useState("1");
   const [dniSearch, setDniSearch] = useState("");
   const [showParent, setShowParent] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const limit = 10;
 
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState<{ year: string; grade: string } | null>({ year: "2026", grade: "3" });
+  const [appliedFilters, setAppliedFilters] = useState<{ year: string; grade: string } | null>(null);
   const [updateMessage, setUpdateMessage] = useState<{
     text: string;
     isSuccess: boolean;
@@ -329,7 +329,7 @@ export default function ListStudent() {
           </Select>
         </div>
         <div>
-          <label className="text-sm font-medium">Buscar por DNI</label>
+          <label className="text-sm font-medium">Filtrar por DNI</label>
           <Input
             type="text"
             placeholder="Ingrese DNI..."
@@ -348,7 +348,7 @@ export default function ListStudent() {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Cargando...
             </>
-          ) : "Buscar"}
+          ) : "Ver"}
         </Button>
       </div>
 
@@ -401,7 +401,7 @@ export default function ListStudent() {
                 <TableCell colSpan={6} className="text-center py-4">
                   {dniSearch.trim() !== ""
                     ? `No se encontraron estudiantes con DNI: ${dniSearch}`
-                    : "No hay estudiantes registrados"
+                    : !appliedFilters ? "Seleccione Año y Grado, luego presione Ver" : "No hay estudiantes registrados"
                   }
                 </TableCell>
               </TableRow>
