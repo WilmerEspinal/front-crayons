@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import api from "@/lib/axios";
 import { utils, writeFile } from "xlsx";
 import {
@@ -90,16 +90,6 @@ export default function ReporteAsistenciaClases() {
     const [totalPagesMes, setTotalPagesMes] = useState(1);
     const [totalMes, setTotalMes] = useState(0);
     const LIMIT = 15;
-
-    // ─── Efecto para recargar automáticamente al cambiar filtros ───────────────
-    // Solo si ya hay datos o se interactúa explícitamente con los botones de estado
-    useEffect(() => {
-        if (reporte.length > 0 || totalDia > 0) fetchReporteDia(1);
-    }, [estadoDia]);
-
-    useEffect(() => {
-        if (reporteMes.length > 0 || totalMes > 0) fetchReporteMes(1);
-    }, [filtroEstadoMes]);
 
     // ─── Consulta por día ─────────────────────────────────────────────────────
     const fetchReporteDia = useCallback(async (page = 1) => {
@@ -392,15 +382,6 @@ export default function ReporteAsistenciaClases() {
                             </div>
                         )}
 
-                        <Button
-                            onClick={handleConsultar}
-                            disabled={loading}
-                            variant="outline"
-                            className="h-8 px-4 rounded-md text-xs border-slate-200 hover:bg-slate-50"
-                        >
-                            {loading ? "Cargando..." : <><Search size={14} className="mr-2" /> Ver</>}
-                        </Button>
-
                         {/* Filtro de estado */}
                         {modoFiltro === "dia" && (
                             <div className="inline-flex bg-white border border-slate-200 rounded-md overflow-hidden">
@@ -434,6 +415,14 @@ export default function ReporteAsistenciaClases() {
                                 ))}
                             </div>
                         )}
+
+                        <Button
+                            onClick={handleConsultar}
+                            disabled={loading}
+                            className="h-8 px-4 rounded-md text-xs bg-blue-600 hover:bg-blue-700 text-white border-none shadow-sm ml-auto"
+                        >
+                            {loading ? "Cargando..." : <><Search size={14} className="mr-2" /> Ver</>}
+                        </Button>
                     </div>
 
                     <div className="relative w-64">
