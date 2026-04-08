@@ -155,7 +155,7 @@ export const fetchDebtorsReport = async (gradeFilter: string = 'Todos', statusFi
   const idGrado = gradeFilter === 'Todos' ? '0' : gradeFilter;
 
   try {
-    const response = await api.get(`/cuotas/filtro/${yearFilter}/${idGrado}/todo`);
+    const response = await api.get(`/cuotas/filtro/${yearFilter}/${idGrado}/todo?limit=todo`);
     const result = response.data;
 
     if (result.status && Array.isArray(result.data)) {

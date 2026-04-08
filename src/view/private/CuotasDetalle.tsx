@@ -105,6 +105,10 @@ const CuotasDetalle = () => {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [periods, setPeriods] = useState<AcademicPeriod[]>([]);
 
+  // Paginación para el reporte de estados
+  const [currentReportPage, setCurrentReportPage] = useState(1);
+  const [rowsPerPage] = useState(10);
+
   // Custom Modal State
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
@@ -160,6 +164,7 @@ const CuotasDetalle = () => {
     try {
       const data = await fetchDebtorsReport(selectedGrade, selectedStatus, selectedYear);
       setReportData(data);
+      setCurrentReportPage(1); // Reset a primera página al buscar
     } catch (error) {
     } finally {
       setIsReportLoading(false);
@@ -719,7 +724,7 @@ const CuotasDetalle = () => {
                     {isReportLoading ? (
                       <TableRow><TableCell colSpan={7} className="h-32 text-center">Cargando datos...</TableCell></TableRow>
                     ) : reportData.length > 0 ? (
-                      reportData.map((item) => (
+                      reportData.slice((currentReportPage - 1) * rowsPerPage, currentReportPage * rowsPerPage).map((item) => (
                         <Fragment key={item.dni}>
                           <TableRow
                             className="cursor-pointer hover:bg-gray-50/50"
@@ -816,6 +821,39 @@ const CuotasDetalle = () => {
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Controles de Paginación para Reporte */}
+              {reportData.length > rowsPerPage && (
+                <div className="flex justify-center items-center gap-4 mt-6 pt-6 border-t font-sans">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentReportPage <= 1 || isReportLoading}
+                    onClick={() => {
+                      setCurrentReportPage(currentReportPage - 1);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="rounded-lg h-9 px-4 border-slate-200"
+                  >
+                    Anterior
+                  </Button>
+                  <div className="text-sm text-slate-600 font-medium whitespace-nowrap">
+                    Página <span className="text-blue-600">{currentReportPage}</span> de {Math.ceil(reportData.length / rowsPerPage)}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentReportPage >= Math.ceil(reportData.length / rowsPerPage) || isReportLoading}
+                    onClick={() => {
+                      setCurrentReportPage(currentReportPage + 1);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="rounded-lg h-9 px-4 border-slate-200"
+                  >
+                    Siguiente
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
