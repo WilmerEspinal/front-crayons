@@ -465,7 +465,7 @@ export default function RegisterTeacher() {
                   value={formData.sexo}
                   onValueChange={(value) => setFormData((prev) => ({ ...prev, sexo: value }))}
                 >
-                  <SelectTrigger className="mt-1 h-9 bg-white border border-slate-300 rounded px-3 text-sm focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500">
+                  <SelectTrigger className="w-full mt-1 h-9 bg-white border border-slate-300 rounded px-3 text-sm focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500">
                     <SelectValue placeholder="Seleccione..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -535,7 +535,7 @@ export default function RegisterTeacher() {
                     }
                   }}
                 >
-                  <SelectTrigger className="mt-1 h-9 bg-white border border-slate-300 rounded px-3 text-sm focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500">
+                  <SelectTrigger className="w-full mt-1 h-9 bg-white border border-slate-300 rounded px-3 text-sm focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500">
                     <SelectValue placeholder="Seleccione período..." />
                   </SelectTrigger>
                   <SelectContent>

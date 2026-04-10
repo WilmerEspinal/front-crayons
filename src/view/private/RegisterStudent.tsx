@@ -137,7 +137,7 @@ export default function RegisterStudent() {
     alumno_sexo: "",
     alumno_lengua_materna: "",
     alumno_direccion: "",
-    alumno_religion: "Católico", // Valor por defecto común o vacío
+    alumno_religion: "",
     id_grado: "",
     tipo_ingreso: "",
 
@@ -340,7 +340,6 @@ export default function RegisterStudent() {
       case 'padre_fecha_nacimiento':
       case 'madre_nombre':
       case 'madre_ap_p':
-      case 'madre_ap_m':
       case 'madre_fecha_nacimiento':
       case 'año_academico':
         if (!stringValue) return 'Este campo es obligatorio';
@@ -388,18 +387,30 @@ export default function RegisterStudent() {
         }
       });
     } else if (currentStep === 1) {
-      // Al menos uno debe estar presente
-      const hasPadre = formData.padre_dni && formData.padre_nombre;
-      const hasMadre = formData.madre_dni && formData.madre_nombre;
+      const padreFields = ["padre_dni", "padre_nombre", "padre_ap_p", "padre_ap_m", "padre_fecha_nacimiento", "padre_telefono", "padre_email"];
+      const madreFields = ["madre_dni", "madre_nombre", "madre_ap_p", "madre_ap_m", "madre_fecha_nacimiento", "madre_telefono", "madre_email"];
 
-      if (!hasPadre && !hasMadre) {
+      const isPadreStarted = padreFields.some(field => formData[field as keyof FormData]);
+      const isMadreStarted = madreFields.some(field => formData[field as keyof FormData]);
+
+      if (!isPadreStarted && !isMadreStarted) {
         newErrors[activeTab + '_dni'] = 'Debe registrar al menos un padre o madre';
         isValid = false;
-      } else {
-        const prefix = hasPadre ? 'padre' : 'madre';
-        const fields = [`${prefix}_dni`, `${prefix}_nombre`, `${prefix}_ap_p`, `${prefix}_ap_m`, `${prefix}_fecha_nacimiento`, `${prefix}_telefono`, `${prefix}_email`];
-        fields.forEach(field => {
-          const error = validateField(field, formData[field]);
+      }
+
+      if (isPadreStarted) {
+        padreFields.forEach(field => {
+          const error = validateField(field, formData[field as keyof FormData]);
+          if (error) {
+            newErrors[field] = error;
+            isValid = false;
+          }
+        });
+      }
+
+      if (isMadreStarted) {
+        madreFields.forEach(field => {
+          const error = validateField(field, formData[field as keyof FormData]);
           if (error) {
             newErrors[field] = error;
             isValid = false;
@@ -588,7 +599,7 @@ export default function RegisterStudent() {
         onValueChange={(value) => handleSelectChange(name, value)}
       >
         <SelectTrigger className={clsx(
-          "h-9 bg-white border border-slate-300 rounded px-3 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500",
+          "w-full h-9 bg-white border border-slate-300 rounded px-3 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500",
           errors[name] ? "border-red-500" : ""
         )}>
           <SelectValue placeholder="Seleccione..." />
@@ -668,9 +679,12 @@ export default function RegisterStudent() {
       if (response.data.status) {
         setFormData((prev) => ({
           ...prev,
-          [`${tipo}_nombre`]: response.data.data.first_name || response.data.data.nombres,
-          [`${tipo}_ap_p`]: response.data.data.first_last_name || response.data.data.apellidoPaterno,
-          [`${tipo}_ap_m`]: response.data.data.second_last_name || response.data.data.apellidoMaterno,
+          [`${tipo}_nombre`]: response.data.data.first_name || response.data.data.nombres || prev[`${tipo}_nombre`],
+          [`${tipo}_ap_p`]: response.data.data.first_last_name || response.data.data.apellidoPaterno || prev[`${tipo}_ap_p`],
+          [`${tipo}_ap_m`]: response.data.data.second_last_name || response.data.data.apellidoMaterno || prev[`${tipo}_ap_m`],
+          [`${tipo}_email`]: response.data.data.email || prev[`${tipo}_email`],
+          [`${tipo}_telefono`]: response.data.data.telefono || prev[`${tipo}_telefono`],
+          [`${tipo}_ocupacion`]: response.data.data.ocupacion || prev[`${tipo}_ocupacion`],
         }));
 
         setMessage({
@@ -884,7 +898,7 @@ export default function RegisterStudent() {
         c9: 0,
         c10: 0,
         tipo_ingreso: "",
-        alumno_religion: "Católico",
+        alumno_religion: "",
       });
       setStep(0);
     } catch (error: unknown) {
