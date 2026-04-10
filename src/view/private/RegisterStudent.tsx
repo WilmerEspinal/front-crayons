@@ -684,6 +684,9 @@ export default function RegisterStudent() {
           [`${tipo}_ap_m`]: response.data.data.second_last_name || response.data.data.apellidoMaterno || prev[`${tipo}_ap_m`],
           [`${tipo}_email`]: response.data.data.email || prev[`${tipo}_email`],
           [`${tipo}_telefono`]: response.data.data.telefono || prev[`${tipo}_telefono`],
+          [`${tipo}_fecha_nacimiento`]: response.data.data.fecha_nacimiento ?
+            new Date(response.data.data.fecha_nacimiento).toISOString().split('T')[0] :
+            prev[`${tipo}_fecha_nacimiento`],
           [`${tipo}_ocupacion`]: response.data.data.ocupacion || prev[`${tipo}_ocupacion`],
         }));
 

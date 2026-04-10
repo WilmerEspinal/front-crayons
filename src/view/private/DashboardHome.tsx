@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   fetchSummaryStats, fetchPeriodsList,
   type RecentPayment, type Debtor,
@@ -14,7 +15,7 @@ import {
   TrendingUp, TrendingDown, CreditCard,
   AlertCircle, Loader2, DollarSign, Target,
   AlertTriangle, GraduationCap, Clock, CheckCircle2,
-  Briefcase
+  Briefcase, RefreshCw
 } from "lucide-react";
 
 const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -57,11 +58,11 @@ export default function DashboardHome() {
     initData();
   }, []);
 
-  const fetchDashboardData = async (year: string) => {
+  const fetchDashboardData = async (year: string, forceRefresh: boolean = false) => {
     if (!year) return;
     try {
       setIsLoading(true);
-      const summary = await fetchSummaryStats(year);
+      const summary = await fetchSummaryStats(year, forceRefresh);
       if (summary) {
         setSummaryData(summary);
         setRecentPayments(summary.recent_payments || []);
@@ -145,6 +146,9 @@ export default function DashboardHome() {
               <AlertTriangle className="h-4 w-4" /> PERÍODO INACTIVO
             </span>
           )}
+          <Button variant="outline" size="icon" className="h-8 w-8 bg-white border-slate-300 shadow-sm" onClick={() => fetchDashboardData(selectedYear, true)} title="Recargar datos (Ignorar caché)">
+            <RefreshCw className="h-3.5 w-3.5 text-slate-600" />
+          </Button>
           <Select value={selectedYear} onValueChange={handleYearChange}>
             <SelectTrigger className="w-[110px] h-8 bg-white border-slate-300 text-xs shadow-sm">
               <SelectValue placeholder="Año" />

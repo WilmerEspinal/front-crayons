@@ -138,9 +138,13 @@ export const fetchDashboardStats = async (): Promise<DashboardStats> => {
   };
 };
 
-export const fetchSummaryStats = async (anio?: string): Promise<DashboardSummaryData | null> => {
+export const fetchSummaryStats = async (anio?: string, refresh: boolean = false): Promise<DashboardSummaryData | null> => {
   try {
-    const url = anio ? `/dashboard/estadisticas?anio=${anio}` : '/dashboard/estadisticas';
+    const params = new URLSearchParams();
+    if (anio) params.append('anio', anio);
+    if (refresh) params.append('refresh', 'true');
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const url = `/dashboard/estadisticas${queryString}`;
     const response = await api.get(url);
     if (response.data.success) {
       return response.data.data;

@@ -25,3 +25,4 @@ dist-ssr
 
 skill.md
 .env
+seed_students.js

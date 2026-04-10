@@ -38,6 +38,7 @@ type Apoderado = {
   telefono: string | null;
   email: string | null;
   parentesco: string;
+  hijos?: { nombre: string; grado: string }[];
 };
 
 type Student = {
@@ -609,6 +610,19 @@ function CardGroup({ student, showParent, setShowParent, handleToggleEstado, dis
 
                         <span className="text-slate-600 font-medium">Correo:</span>
                         <span>{apoderado.email || "No registrado"}</span>
+
+                        {apoderado.hijos && apoderado.hijos.length > 0 && (
+                          <>
+                            <span className="text-blue-600 font-medium mt-1">Otros Hijos:</span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {apoderado.hijos.map((hijo: any, hIdx: number) => (
+                                <span key={hIdx} className="bg-blue-50 text-blue-700 text-[10px] leading-tight px-1.5 py-0.5 rounded border border-blue-100 shadow-sm">
+                                  {hijo.nombre} ({hijo.grado})
+                                </span>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
