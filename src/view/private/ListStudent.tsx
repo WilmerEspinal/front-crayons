@@ -18,11 +18,39 @@ import {
 } from "@/components/ui/table";
 import axios from "axios";
 import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
-import { Loader2, UserX, UserPlus, AlertCircle, AlertTriangle, CheckCircle2, X } from "lucide-react";
+import { Loader2, UserX, UserPlus, Ban, GraduationCap, AlertCircle, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DetalleAlumnoModal } from "@/components/DetalleAlumnoModal";
+import { HistorialEstadoAlumnoModal } from "@/components/HistorialEstadoAlumnoModal";
+import { BotonCompacto, claseInput, Etiqueta } from "@/components/FormularioCompacto";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+// Codigos de tab_parametro '0001' (estado del alumno)
+const ESTADO = { ACTIVO: "AC", RETIRADO: "RE", EGRESADO: "EG", EXPULSADO: "EX" } as const;
+
+const ACCIONES_ESTADO: Record<string, { titulo: string; boton: string; descripcion: string; tipo: "danger" | "success" }> = {
+  [ESTADO.RETIRADO]: {
+    titulo: "Retirar alumno",
+    boton: "Retirar",
+    descripcion: "El alumno dejará de estudiar y perderá el acceso al sistema junto con sus apoderados.",
+    tipo: "danger",
+  },
+  [ESTADO.EXPULSADO]: {
+    titulo: "Expulsar alumno",
+    boton: "Expulsar",
+    descripcion: "Se registrará la separación definitiva del alumno y perderá el acceso al sistema.",
+    tipo: "danger",
+  },
+  [ESTADO.ACTIVO]: {
+    titulo: "Reactivar alumno",
+    boton: "Reactivar",
+    descripcion: "El alumno vuelve a estudiar y recupera el acceso al sistema junto con sus apoderados.",
+    tipo: "success",
+  },
+};
 
 interface Periodo {
   id: number;
@@ -51,6 +79,10 @@ type Student = {
   grado: string;
   fecha_matricula: string;
   estado: string;
+  estado_nombre: string | null;
+  motivo_estado: string | null;
+  fecha_estado: string | null;
+  es_ultimo_grado: boolean;
   activo: number;
   periodo_activo?: number;
   apoderados: Apoderado[];
@@ -63,7 +95,8 @@ export default function ListStudent() {
   const [year, setYear] = useState("2026");
   const [grade, setGrade] = useState("1");
   const [dniSearch, setDniSearch] = useState("");
-  const [showParent, setShowParent] = useState<number | null>(null);
+  const [alumnoDetalle, setAlumnoDetalle] = useState<Student | null>(null);
+  const [alumnoHistorial, setAlumnoHistorial] = useState<Student | null>(null);
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -73,6 +106,13 @@ export default function ListStudent() {
     text: string;
     isSuccess: boolean;
   } | null>(null);
+
+  // Cambio de estado con motivo (RE, EX, AC) y egreso del ultimo grado
+  const [cambioEstado, setCambioEstado] = useState<{ student: Student; idEstado: string } | null>(null);
+  const [egreso, setEgreso] = useState<{ todos: boolean } | null>(null);
+  const [motivo, setMotivo] = useState("");
+  const [guardando, setGuardando] = useState(false);
+  const [seleccionados, setSeleccionados] = useState<number[]>([]);
 
   // Custom Modal State
   const [modalConfig, setModalConfig] = useState<{
@@ -103,18 +143,6 @@ export default function ListStudent() {
     });
   };
 
-  const showConfirm = (title: string, description: string, onConfirm: () => void, type: "info" | "success" | "danger" | "warning" = "info") => {
-    setModalConfig({
-      isOpen: true,
-      title,
-      description,
-      onConfirm,
-      confirmText: "Confirmar",
-      cancelText: "Cancelar",
-      showCancel: true,
-      type
-    });
-  };
 
   // Queries para datos estáticos (cacheados)
   const { data: yearsAvailable = EMPTY_ARRAY } = useQuery<Periodo[]>({
@@ -169,76 +197,87 @@ export default function ListStudent() {
 
   const currentPeriodoActivo = yearsAvailable.find(p => p.anio.toString() === appliedFilters?.year)?.activo;
 
-  // Función para actualizar un estudiante específico en la lista
-  const updateStudentInList = (updatedStudent: any) => {
-    // Actualizar la caché localmente
-    queryClient.setQueryData(['studentsList', appliedFilters?.year, appliedFilters?.grade, page, limit], (oldData: any) => {
-      if (!oldData) return oldData;
-      return {
-        ...oldData,
-        data: oldData.data.map((student: any) =>
-          student.alumno_id === updatedStudent.alumno_id
-            ? {
-              ...student,
-              alumno_nombre: updatedStudent.nombre,
-              alumno_apellido_paterno: updatedStudent.ap_p,
-              alumno_apellido_materno: updatedStudent.ap_m,
-              fecha_nacimiento: updatedStudent.fecha_nacimiento
-            }
-            : student
-        )
-      };
-    });
-
-    setUpdateMessage({
-      text: `Datos actualizados: ${updatedStudent.nombre} ${updatedStudent.ap_p}`,
-      isSuccess: true
-    });
-
-    setTimeout(() => {
-      setUpdateMessage(null);
-    }, 2000);
-  };
-
-  const handleToggleEstado = async (alumno_id: number, currentEstado: string) => {
+  const periodoInactivo = () => {
     if (currentPeriodoActivo === 0) {
       showAlert("Acción restringida", "No se pueden realizar cambios en un periodo académico inactivo.", "warning");
-      return;
+      return true;
     }
+    return false;
+  };
 
-    const token = localStorage.getItem("token");
-    const isRetiring = currentEstado === 'Activo';
-    const nuevoEstado = isRetiring ? 'Retirado' : 'Activo';
-    const nuevoActivo = isRetiring ? 0 : 1;
+  const abrirCambioEstado = (student: Student, idEstado: string) => {
+    if (periodoInactivo()) return;
+    setMotivo("");
+    setCambioEstado({ student, idEstado });
+  };
 
-    const confirmMsg = isRetiring
-      ? "¿Estás seguro de que deseas dar de baja a este alumno? Se le quitará el acceso al sistema."
-      : "¿Estás seguro de que deseas RE-INCORPORAR a este alumno? Se le habilitará el acceso de nuevo.";
+  const abrirEgreso = (todos: boolean) => {
+    if (periodoInactivo()) return;
+    setMotivo("");
+    setEgreso({ todos });
+  };
 
-    showConfirm(
-      isRetiring ? "Dar de Baja" : "Habilitar Alumno",
-      confirmMsg,
-      async () => {
-        try {
-          const { data } = await axios.patch(
-            `${API_URL}/alumno/toggle-estado/${alumno_id}`,
-            { estado: nuevoEstado, activo: nuevoActivo },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+  const refrescarLista = (mensaje: string) => {
+    setSeleccionados([]);
+    queryClient.invalidateQueries({ queryKey: ['studentsList'] });
+    setUpdateMessage({ text: mensaje, isSuccess: true });
+    setTimeout(() => setUpdateMessage(null), 3000);
+  };
 
-          if (data.success) {
-            setUpdateMessage({ text: data.message, isSuccess: true });
-            queryClient.invalidateQueries({ queryKey: ['studentsList'] });
-            setTimeout(() => setUpdateMessage(null), 3000);
-            showAlert("Éxito", `El alumno ha sido ${isRetiring ? "retirado" : "habilitado"} correctamente.`, "success");
-          } else {
-            showAlert("Error", data.message || "Error al cambiar el estado", "danger");
-          }
-        } catch (error: any) {
-          showAlert("Error de Conexión", error.response?.data?.error || "Error al conectar con el servidor", "danger");
-        }
-      },
-      isRetiring ? "danger" : "success"
+  const guardarCambioEstado = async () => {
+    if (!cambioEstado) return;
+    if (motivo.trim().length < 5) return;
+
+    setGuardando(true);
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.patch(
+        `${API_URL}/alumno/estado/${cambioEstado.student.alumno_id}`,
+        { id_estado: cambioEstado.idEstado, motivo: motivo.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCambioEstado(null);
+      refrescarLista(data.message);
+    } catch (error: any) {
+      showAlert("Error", error.response?.data?.message || "Error al conectar con el servidor", "danger");
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const guardarEgreso = async () => {
+    if (!egreso) return;
+
+    setGuardando(true);
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.post(
+        `${API_URL}/alumno/egresar`,
+        egreso.todos
+          ? { todos: true, motivo: motivo.trim() || undefined }
+          : { ids: seleccionados, motivo: motivo.trim() || undefined },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEgreso(null);
+      refrescarLista(data.message);
+    } catch (error: any) {
+      showAlert("Error", error.response?.data?.message || "Error al conectar con el servidor", "danger");
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const esUltimoGrado = students.some((st: Student) => st.es_ultimo_grado);
+  const activosPagina = filteredStudents.filter((st) => st.estado === ESTADO.ACTIVO).map((st) => st.alumno_id);
+  const todosPaginaSeleccionados = activosPagina.length > 0 && activosPagina.every((id) => seleccionados.includes(id));
+
+  const alternarSeleccion = (id: number, marcado: boolean) => {
+    setSeleccionados((prev) => (marcado ? [...prev, id] : prev.filter((x) => x !== id)));
+  };
+
+  const alternarPagina = (marcado: boolean) => {
+    setSeleccionados((prev) =>
+      marcado ? [...new Set([...prev, ...activosPagina])] : prev.filter((id) => !activosPagina.includes(id))
     );
   };
 
@@ -264,6 +303,7 @@ export default function ListStudent() {
   // Reset page when year or grade changes (from applied filters)
   useEffect(() => {
     setPage(1);
+    setSeleccionados([]);
   }, [appliedFilters]);
 
   const handleSearch = () => {
@@ -271,13 +311,15 @@ export default function ListStudent() {
     setPage(1);
   };
 
+  const columnas = esUltimoGrado ? 7 : 6;
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* Banner de Periodo Inactivo */}
       {appliedFilters?.year && currentPeriodoActivo === 0 && (
         <div className="bg-orange-50 border border-orange-200 text-orange-800 p-4 rounded-lg flex items-center gap-3 text-sm font-medium">
           <span className="text-xl">⚠️</span>
-          Este periodo académico está <strong className="font-bold">Inactivo</strong>. Las acciones de retiro, habilitación y edición de datos están deshabilitadas.
+          Este periodo académico está <strong className="font-bold">Inactivo</strong>. Las acciones de retiro, reactivación y egreso están deshabilitadas.
         </div>
       )}
 
@@ -363,6 +405,32 @@ export default function ListStudent() {
         </div>
       )}
 
+      {esUltimoGrado && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-[5px] border border-amber-200 bg-amber-50 px-2.5 py-2 text-xs text-amber-800">
+          <span>
+            Último grado: marca a los alumnos que culminaron el nivel para pasarlos a <strong>Egresado</strong>.
+          </span>
+          <div className="flex gap-2">
+            <BotonCompacto
+              variante="secundario"
+              icono={GraduationCap}
+              disabled={seleccionados.length === 0 || currentPeriodoActivo === 0}
+              onClick={() => abrirEgreso(false)}
+            >
+              Egresar seleccionados ({seleccionados.length})
+            </BotonCompacto>
+            <BotonCompacto
+              icono={GraduationCap}
+              className="!bg-amber-600 hover:!bg-amber-700"
+              disabled={currentPeriodoActivo === 0}
+              onClick={() => abrirEgreso(true)}
+            >
+              Egresar todo el grado
+            </BotonCompacto>
+          </div>
+        </div>
+      )}
+
       {/* Información de resultados */}
       <div className="flex justify-between items-center text-sm text-slate-700 font-medium">
         <div>
@@ -379,6 +447,16 @@ export default function ListStudent() {
         <Table>
           <TableHeader>
             <TableRow>
+              {esUltimoGrado && (
+                <TableHead className="w-8">
+                  <Checkbox
+                    checked={todosPaginaSeleccionados}
+                    onCheckedChange={(v) => alternarPagina(v === true)}
+                    disabled={activosPagina.length === 0}
+                    title="Seleccionar activos de esta página"
+                  />
+                </TableHead>
+              )}
               <TableHead>DNI</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Grado</TableHead>
@@ -390,7 +468,7 @@ export default function ListStudent() {
           <TableBody>
             {loading && students.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8">
+                <TableCell colSpan={columnas} className="text-center py-8">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                     <p className="text-sm text-slate-500">Cargando estudiantes...</p>
@@ -399,7 +477,7 @@ export default function ListStudent() {
               </TableRow>
             ) : filteredStudents.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
+                <TableCell colSpan={columnas} className="text-center py-4">
                   {dniSearch.trim() !== ""
                     ? `No se encontraron estudiantes con DNI: ${dniSearch}`
                     : !appliedFilters ? "Seleccione Año y Grado, luego presione Ver" : "No hay estudiantes registrados"
@@ -408,14 +486,16 @@ export default function ListStudent() {
               </TableRow>
             ) : (
               filteredStudents.map((student) => (
-                <CardGroup
+                <FilaAlumno
                   key={student.alumno_id}
                   student={student}
-                  showParent={showParent}
-                  setShowParent={setShowParent}
-                  updateStudentInList={updateStudentInList}
-                  handleToggleEstado={handleToggleEstado}
+                  verDetalle={setAlumnoDetalle}
+                  verHistorial={setAlumnoHistorial}
+                  abrirCambioEstado={abrirCambioEstado}
                   disabled={currentPeriodoActivo === 0}
+                  conSeleccion={esUltimoGrado}
+                  seleccionado={seleccionados.includes(student.alumno_id)}
+                  alternarSeleccion={alternarSeleccion}
                 />
               ))
             )}
@@ -460,6 +540,116 @@ export default function ListStudent() {
           </Button>
         </div>
       )}
+
+      {alumnoHistorial && (
+        <HistorialEstadoAlumnoModal
+          idAlumno={alumnoHistorial.alumno_id}
+          nombreAlumno={`${alumnoHistorial.alumno_nombre} ${alumnoHistorial.alumno_apellido_paterno} ${alumnoHistorial.alumno_apellido_materno}`}
+          estilosEstado={ESTILO_ESTADO}
+          onClose={() => setAlumnoHistorial(null)}
+        />
+      )}
+
+      {alumnoDetalle && (
+        <DetalleAlumnoModal
+          alumno={alumnoDetalle}
+          estiloEstado={ESTILO_ESTADO[alumnoDetalle.estado] || ""}
+          onClose={() => setAlumnoDetalle(null)}
+        />
+      )}
+
+      <Dialog
+        open={!!cambioEstado || !!egreso}
+        onOpenChange={(open) => {
+          if (!open && !guardando) {
+            setCambioEstado(null);
+            setEgreso(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-md gap-0 rounded-lg p-0 [&>button]:hidden">
+          {(() => {
+            const accion = cambioEstado ? ACCIONES_ESTADO[cambioEstado.idEstado] : null;
+            const motivoObligatorio = !!cambioEstado;
+            const motivoValido = !motivoObligatorio || motivo.trim().length >= 5;
+            const cerrar = () => {
+              setCambioEstado(null);
+              setEgreso(null);
+            };
+            return (
+              <>
+                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                  <div>
+                    <div className="text-[15px] font-extrabold text-slate-900">
+                      {accion ? accion.titulo : "Pasar a egresado"}
+                    </div>
+                    {cambioEstado && (
+                      <div className="text-xs text-slate-500">
+                        {cambioEstado.student.alumno_nombre} {cambioEstado.student.alumno_apellido_paterno}{" "}
+                        {cambioEstado.student.alumno_apellido_materno} · DNI {cambioEstado.student.alumno_dni}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={cerrar}
+                    disabled={guardando}
+                    aria-label="Cerrar"
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[5px] bg-slate-100 text-slate-500 hover:text-slate-900"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-3 px-5 py-4">
+                  <p className="text-xs text-slate-600">
+                    {accion
+                      ? accion.descripcion
+                      : egreso?.todos
+                        ? "Todos los alumnos activos del último grado pasarán a Egresado y perderán el acceso al sistema."
+                        : `${seleccionados.length} alumno(s) pasarán a Egresado y perderán el acceso al sistema.`}
+                  </p>
+                  <div className="flex flex-col gap-1">
+                    <Etiqueta obligatorio={motivoObligatorio}>Motivo {motivoObligatorio ? "" : "(opcional)"}</Etiqueta>
+                    <textarea
+                      value={motivo}
+                      onChange={(e) => setMotivo(e.target.value)}
+                      maxLength={255}
+                      rows={3}
+                      placeholder={motivoObligatorio ? "Describe el motivo..." : "Culminó el nivel educativo"}
+                      className={`${claseInput} !h-auto resize-none py-1`}
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-400">
+                      <span>{motivoObligatorio && !motivoValido ? "Mínimo 5 caracteres." : ""}</span>
+                      <span>{motivo.length}/255</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 border-t border-slate-100 px-5 py-3">
+                  <BotonCompacto variante="secundario" disabled={guardando} onClick={cerrar}>
+                    Cancelar
+                  </BotonCompacto>
+                  <BotonCompacto
+                    cargando={guardando}
+                    disabled={guardando || !motivoValido}
+                    onClick={cambioEstado ? guardarCambioEstado : guardarEgreso}
+                    className={
+                      accion?.tipo === "danger"
+                        ? "!bg-red-600 hover:!bg-red-700"
+                        : accion
+                          ? "!bg-green-600 hover:!bg-green-700"
+                          : "!bg-amber-600 hover:!bg-amber-700"
+                    }
+                  >
+                    {accion ? accion.boton : "Pasar a egresado"}
+                  </BotonCompacto>
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={modalConfig.isOpen} onOpenChange={(open) => setModalConfig(prev => ({ ...prev, isOpen: open }))}>
         <DialogContent className="max-w-[340px] p-0 overflow-hidden rounded-2xl border-none shadow-2xl">
@@ -509,131 +699,120 @@ export default function ListStudent() {
   );
 }
 
-// Subcomponente para organizar el Fragment/Rows y evitar problemas de Key
-function CardGroup({ student, showParent, setShowParent, handleToggleEstado, disabled }: any) {
-  const isRetirado = student.estado === 'Retirado';
-  const isEgresado = student.estado === 'Egresado';
+const ESTILO_ESTADO: Record<string, string> = {
+  [ESTADO.ACTIVO]: "bg-green-100 text-green-700",
+  [ESTADO.RETIRADO]: "bg-red-100 text-red-700",
+  [ESTADO.EGRESADO]: "bg-amber-100 text-amber-700",
+  [ESTADO.EXPULSADO]: "bg-slate-800 text-white",
+};
+
+type FilaAlumnoProps = {
+  student: Student;
+  verDetalle: (student: Student) => void;
+  verHistorial: (student: Student) => void;
+  abrirCambioEstado: (student: Student, idEstado: string) => void;
+  disabled: boolean;
+  conSeleccion: boolean;
+  seleccionado: boolean;
+  alternarSeleccion: (id: number, marcado: boolean) => void;
+};
+
+// Fila de la tabla de alumnos
+function FilaAlumno({ student, verDetalle, verHistorial, abrirCambioEstado, disabled, conSeleccion, seleccionado, alternarSeleccion }: FilaAlumnoProps) {
+  const esActivo = student.estado === ESTADO.ACTIVO;
+  const esEgresado = student.estado === ESTADO.EGRESADO;
+  const fueraDelColegio = student.estado === ESTADO.RETIRADO || student.estado === ESTADO.EXPULSADO;
+  const claseBotonFila = "!h-[24px] !px-2 !text-[10.5px]";
+  const claseEstado = `border-transparent ${ESTILO_ESTADO[student.estado] || "bg-slate-100 text-slate-600"}`;
 
   return (
-    <>
-      <TableRow className={isRetirado ? "bg-slate-50 opacity-80" : ""}>
-        <TableCell className="font-mono text-xs">{student.alumno_dni}</TableCell>
+    <TableRow className={fueraDelColegio ? "bg-slate-50 opacity-80" : ""}>
+      {conSeleccion && (
         <TableCell>
-          <div className="flex flex-col">
-            <span className="font-semibold text-slate-900">
-              {student.alumno_nombre} {student.alumno_apellido_paterno}{" "}
-              {student.alumno_apellido_materno}
-            </span>
-          </div>
+          <Checkbox
+            checked={seleccionado}
+            onCheckedChange={(v) => alternarSeleccion(student.alumno_id, v === true)}
+            disabled={!esActivo || disabled}
+          />
         </TableCell>
-        <TableCell>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-            {student.grado}
-          </Badge>
-        </TableCell>
-        <TableCell>
-          {isRetirado ? (
-            <Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200">
-              Baja
-            </Badge>
-          ) : isEgresado ? (
-            <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-amber-200">
-              Egresado
-            </Badge>
-          ) : (
-            <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100">
-              Activo
-            </Badge>
-          )}
-        </TableCell>
-        <TableCell>
-          {new Date(student.fecha_matricula).toLocaleDateString()}
-        </TableCell>
-        <TableCell className="flex justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50"
-            onClick={() =>
-              setShowParent(
-                showParent === student.alumno_id
-                  ? null
-                  : student.alumno_id
-              )
-            }
-            title="Ver Apoderados"
-          >
-            {showParent === student.alumno_id ? "Ocultar" : "Apoderados"}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleToggleEstado(student.alumno_id, student.estado)}
-            disabled={disabled || isEgresado}
-            className={isRetirado
-              ? "text-green-600 border-green-200 hover:bg-green-50"
-              : "text-red-600 border-red-200 hover:bg-red-50"
-            }
-            title={isRetirado ? "Re-incorporar Estudiante" : isEgresado ? "Alumno Egresado" : "Dar de Baja"}
-          >
-            {isRetirado ? <UserPlus className="w-4 h-4 mr-1" /> : <UserX className="w-4 h-4 mr-1" />}
-            {isRetirado ? "Habilitar" : "Dar de baja"}
-          </Button>
-
-
-        </TableCell>
-      </TableRow>
-
-      {showParent === student.alumno_id && (
-        <TableRow>
-          <TableCell
-            colSpan={6}
-            className="bg-muted px-6 py-4 text-sm"
-          >
-            <div className="space-y-4">
-              <h4 className="font-semibold text-gray-700">Información de Apoderados:</h4>
-              {student.apoderados && student.apoderados.length > 0 ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {student.apoderados.map((apoderado: any, index: number) => (
-                    <div key={index} className="bg-white p-3 rounded border shadow-sm">
-                      <div className="font-medium text-primary mb-1">{apoderado.parentesco}</div>
-                      <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm">
-                        <span className="text-slate-600 font-medium">Nombre:</span>
-                        <span>{apoderado.nombre} {apoderado.apellido_paterno} {apoderado.apellido_materno}</span>
-
-                        <span className="text-slate-600 font-medium">DNI:</span>
-                        <span>{apoderado.dni}</span>
-
-                        <span className="text-slate-600 font-medium">Teléfono:</span>
-                        <span>{apoderado.telefono || "No registrado"}</span>
-
-                        <span className="text-slate-600 font-medium">Correo:</span>
-                        <span>{apoderado.email || "No registrado"}</span>
-
-                        {apoderado.hijos && apoderado.hijos.length > 0 && (
-                          <>
-                            <span className="text-blue-600 font-medium mt-1">Otros Hijos:</span>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {apoderado.hijos.map((hijo: any, hIdx: number) => (
-                                <span key={hIdx} className="bg-blue-50 text-blue-700 text-[10px] leading-tight px-1.5 py-0.5 rounded border border-blue-100 shadow-sm">
-                                  {hijo.nombre} ({hijo.grado})
-                                </span>
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-slate-600 italic">No hay apoderados registrados para este alumno.</div>
-              )}
-            </div>
-          </TableCell>
-        </TableRow>
       )}
-    </>
+      <TableCell className="font-mono text-xs">
+        <button
+          type="button"
+          onClick={() => verDetalle(student)}
+          className="cursor-pointer font-semibold text-blue-700 hover:underline"
+          title="Ver detalle del alumno y apoderados"
+        >
+          {student.alumno_dni}
+        </button>
+      </TableCell>
+      <TableCell>
+        <span className="font-semibold text-slate-900">
+          {student.alumno_nombre} {student.alumno_apellido_paterno}{" "}
+          {student.alumno_apellido_materno}
+        </span>
+      </TableCell>
+      <TableCell>{student.grado}</TableCell>
+      <TableCell>
+        {student.fecha_estado ? (
+          <button
+            type="button"
+            onClick={() => verHistorial(student)}
+            title="Ver historial y observaciones del estado"
+            className="cursor-pointer"
+          >
+            <Badge className={`${claseEstado} underline-offset-2 hover:underline`}>
+              {student.estado_nombre || student.estado}
+            </Badge>
+          </button>
+        ) : (
+          <Badge className={claseEstado}>{student.estado_nombre || student.estado}</Badge>
+        )}
+      </TableCell>
+      <TableCell>
+        {new Date(student.fecha_matricula).toLocaleDateString()}
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-end gap-1.5">
+          {esActivo && (
+            <>
+              <BotonCompacto
+                variante="peligro"
+                icono={UserX}
+                className={claseBotonFila}
+                onClick={() => abrirCambioEstado(student, ESTADO.RETIRADO)}
+                disabled={disabled}
+                title="Retirar alumno"
+              >
+                Retirar
+              </BotonCompacto>
+              <BotonCompacto
+                variante="secundario"
+                icono={Ban}
+                className={claseBotonFila}
+                onClick={() => abrirCambioEstado(student, ESTADO.EXPULSADO)}
+                disabled={disabled}
+                title="Expulsar alumno"
+              >
+                Expulsar
+              </BotonCompacto>
+            </>
+          )}
+          {fueraDelColegio && (
+            <BotonCompacto
+              variante="exito"
+              icono={UserPlus}
+              className={claseBotonFila}
+              onClick={() => abrirCambioEstado(student, ESTADO.ACTIVO)}
+              disabled={disabled}
+              title="Reactivar alumno"
+            >
+              Reactivar
+            </BotonCompacto>
+          )}
+          {esEgresado && <span className="text-[11px] text-slate-400">Sin acciones</span>}
+        </div>
+      </TableCell>
+    </TableRow>
   );
 }

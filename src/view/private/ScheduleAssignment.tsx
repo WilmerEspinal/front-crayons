@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "@/lib/axios";
-import { Calendar, Check, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { Calendar, Check, ChevronDown, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { claseInput, Etiqueta, Seccion, SelectCompacto } from "@/components/FormularioCompacto";
 
 type PeriodoItem = { id: number; anio: number; activo: number };
 type DocenteItem = { id: number; codigo_docente: string; nombre_completo: string };
@@ -52,7 +53,7 @@ for (let h = 7; h < 17; h++) {
   HORAS.push(`${String(h).padStart(2, "0")}:45`);
 }
 // 07:00 - 17:00 boundary included
-const PX_PER_SLOT = 22; // Aumentado para mejor visibilidad
+const PX_PER_SLOT = 18; // alto de cada bloque de 15 min
 const START_MIN = 7 * 60;
 
 const toMin = (h: string) => {
@@ -411,305 +412,330 @@ export default function ScheduleAssignment() {
     } finally { setDeletingId(null); }
   };
 
-  const sel: React.CSSProperties = { width: "100%", appearance: "none", background: "#f9fafb", border: "1px solid #e2e8f0", color: "#1e293b", fontSize: "14px", fontWeight: 600, borderRadius: "12px", padding: "12px 16px", outline: "none", cursor: "pointer", boxSizing: "border-box", transition: "all 0.2s" };
-  const inp: React.CSSProperties = { ...sel };
-  const lbl: React.CSSProperties = { fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#64748b", marginBottom: "6px", display: "block" };
-  const card: React.CSSProperties = { background: "#fff", border: "1px solid #f1f5f9", borderRadius: "24px", padding: "24px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.01)" };
-
   return (
-    <div style={{ minHeight: "100vh", background: "#fcfcfc", fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }} onMouseUp={handleMouseUp}>
-      <div style={{ display: "grid", gridTemplateColumns: "400px 1fr", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-slate-50" onMouseUp={handleMouseUp}>
+      <div className="grid min-h-screen grid-cols-[340px_1fr]">
 
-        <div style={{ borderRight: "1px solid #f1f5f9", padding: "40px 32px", overflowY: "auto", display: "flex", flexDirection: "column", gap: 32 }}>
+        <div className="flex flex-col gap-3 overflow-y-auto border-r border-slate-200 bg-white px-4 py-6">
           <div>
-            <h1 style={{ margin: 0, fontSize: "24px", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em" }}>Nuevo Horario</h1>
-            <p style={{ margin: "4px 0 0", fontSize: "14px", color: "#64748b" }}>Configure los datos y agregue sesiones semanales</p>
+            <h1 className="text-base font-extrabold text-slate-900">Nuevo Horario</h1>
+            <p className="text-xs text-slate-500">Configure los datos y agregue sesiones semanales</p>
           </div>
 
-          {/* Card 1: Datos Generales */}
-          <div style={card}>
-            <p style={{ margin: "0 0 20px", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#94a3b8" }}>DATOS GENERALES</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={lbl}>DOCENTE <span style={{ color: "#ef4444" }}>*</span></label>
-                <select value={idDocente} onChange={e => setIdDocente(e.target.value)} style={sel}>
-                  <option value="">Seleccionar</option>
-                  {docentes.map(d => <option key={d.id} value={d.id}>{d.nombre_completo}</option>)}
-                </select>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={lbl}>PERÍODO <span style={{ color: "#ef4444" }}>*</span></label>
-                  <select value={idPeriodo} onChange={e => setIdPeriodo(e.target.value)} style={sel}>
-                    {periodos.map(p => <option key={p.id} value={p.id}>{p.anio}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label style={lbl}>GRADO <span style={{ color: "#ef4444" }}>*</span></label>
-                  <select value={idGrado} onChange={e => setIdGrado(e.target.value)} style={sel} disabled={!idDocente}>
-                    <option value="">Seleccionar</option>
-                    {gradosDisponibles.map(g => <option key={g.id} value={g.id}>{g.nombre}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label style={lbl}>CURSO <span style={{ color: "#ef4444" }}>*</span></label>
-                <select value={idCurso} onChange={e => setIdCurso(e.target.value)} style={sel} disabled={!idGrado}>
-                  <option value="">Seleccionar</option>
-                  {cursosDisponibles.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
+          <Seccion titulo="Datos generales">
+            <div className="grid grid-cols-[64px_1fr] items-center gap-x-2 gap-y-1.5">
+              <Etiqueta obligatorio>Docente</Etiqueta>
+              <SelectCompacto value={idDocente} onChange={setIdDocente}>
+                <option value="">[ Seleccione ]</option>
+                {docentes.map(d => <option key={d.id} value={d.id}>{d.nombre_completo}</option>)}
+              </SelectCompacto>
 
-          {/* Card 2: Sesiones */}
-          <div style={card}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <p style={{ margin: 0, fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#94a3b8" }}>SESIONES DEL HORARIO</p>
-              <span style={{ fontSize: "12px", fontWeight: 800, color: "#fff", background: "#3b82f6", width: 24, height: 24, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>{bloques.length}</span>
-            </div>
+              <Etiqueta obligatorio>Período</Etiqueta>
+              <SelectCompacto value={idPeriodo} onChange={setIdPeriodo}>
+                {periodos.map(p => <option key={p.id} value={p.id}>{p.anio}</option>)}
+              </SelectCompacto>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, maxHeight: 300, overflowY: "auto", paddingRight: 4 }}>
-              {bloques.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "32px 0" }}>
-                  <div style={{ width: 40, height: 40, background: "#f8fafc", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-                    <Calendar className="w-5 h-5 text-slate-300" />
-                  </div>
-                  <p style={{ fontSize: "13px", color: "#94a3b8" }}>Sin sesiones agregadas</p>
+              <Etiqueta obligatorio>Grado</Etiqueta>
+              <SelectCompacto value={idGrado} onChange={setIdGrado} disabled={!idDocente}>
+                <option value="">[ Seleccione ]</option>
+                {gradosDisponibles.map(g => <option key={g.id} value={g.id}>{g.nombre}</option>)}
+              </SelectCompacto>
+
+              <Etiqueta obligatorio>Curso</Etiqueta>
+              <SelectCompacto value={idCurso} onChange={setIdCurso} disabled={!idGrado}>
+                <option value="">[ Seleccione ]</option>
+                {cursosDisponibles.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+              </SelectCompacto>
+            </div>
+          </Seccion>
+
+          <Seccion
+            titulo="Sesiones del horario"
+            extra={
+              <span className="rounded-[5px] bg-blue-600 px-1.5 text-[10.5px] font-bold leading-4 text-white">
+                {bloques.length}
+              </span>
+            }
+          >
+            {bloques.length === 0 ? (
+              <div className="flex flex-col items-center gap-1.5 py-5 text-xs text-slate-400">
+                <Calendar className="h-4 w-4 text-slate-300" />
+                Sin sesiones. Agregue una o arrastre sobre el calendario.
+              </div>
+            ) : (
+              <div className="max-h-[300px] overflow-y-auto">
+                <div className="grid grid-cols-[1fr_66px_66px_52px_28px] gap-x-1 px-0.5 pb-1 text-[10.5px] font-semibold text-slate-500">
+                  <span>Día</span>
+                  <span>Inicio</span>
+                  <span>Fin</span>
+                  <span>Aula</span>
+                  <span />
                 </div>
-              ) : (
-                bloques.map((sl, i) => {
-                  const conf = conflicts[i];
-                  return (
-                    <div key={sl.id} style={{ padding: 12, border: "1px solid #f1f5f9", borderRadius: 16, background: conf ? "#fff1f2" : "#fff" }}>
-                      <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                        <select value={sl.dia_semana} onChange={e => updateBloque(sl.id, "dia_semana", e.target.value)} style={{ ...sel, padding: "8px 12px", fontSize: 13, background: "#fff" }}>
-                          {DIAS.map(d => <option key={d} value={d}>{d}</option>)}
-                        </select>
-                        <button onClick={() => removeBloque(sl.id)} style={{ color: "#ef4444", background: "#fef2f2", border: "none", borderRadius: 8, padding: "0 10px", cursor: "pointer" }}>
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                <div className="flex flex-col gap-1">
+                  {bloques.map((sl, i) => {
+                    const conf = conflicts[i];
+                    const conBordeError = conf ? claseInput.replace("border-slate-300", "border-red-500") : claseInput;
+                    return (
+                      <div key={sl.id}>
+                        <div className="grid grid-cols-[1fr_66px_66px_52px_28px] items-center gap-x-1">
+                          <div className="relative">
+                            <select
+                              value={sl.dia_semana}
+                              onChange={e => updateBloque(sl.id, "dia_semana", e.target.value)}
+                              className={`${conBordeError} appearance-none pr-5 cursor-pointer`}
+                            >
+                              {DIAS.map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                            <ChevronDown size={12} className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-slate-400" />
+                          </div>
+                          <input
+                            type="time"
+                            value={sl.hora_inicio}
+                            onChange={e => updateBloque(sl.id, "hora_inicio", e.target.value)}
+                            className={`${conBordeError} !px-1`}
+                          />
+                          <input
+                            type="time"
+                            value={sl.hora_fin}
+                            onChange={e => updateBloque(sl.id, "hora_fin", e.target.value)}
+                            className={`${conBordeError} !px-1`}
+                          />
+                          <input
+                            type="text"
+                            value={sl.aula}
+                            maxLength={50}
+                            placeholder="—"
+                            onChange={e => updateBloque(sl.id, "aula", e.target.value.toUpperCase())}
+                            className={conBordeError}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeBloque(sl.id)}
+                            title="Quitar sesión"
+                            className="flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[5px] text-red-500 hover:bg-red-50"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                        {conf && (
+                          <p className="mt-0.5 text-[10.5px] font-semibold text-red-600">⚠ {conf.curso} {conf.grado}</p>
+                        )}
                       </div>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                        <input type="time" value={sl.hora_inicio} onChange={e => updateBloque(sl.id, "hora_inicio", e.target.value)} style={{ ...inp, padding: "8px 12px", fontSize: 13, background: "#fff" }} />
-                        <input type="time" value={sl.hora_fin} onChange={e => updateBloque(sl.id, "hora_fin", e.target.value)} style={{ ...inp, padding: "8px 12px", fontSize: 13, background: "#fff" }} />
-                      </div>
-                      {conf && (
-                        <p style={{ margin: "8px 0 0", fontSize: "11px", color: "#ef4444", fontWeight: 700 }}>⚠ {conf.curso}</p>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 24 }}>
-              <button onClick={addBloque} style={{ height: 44, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, fontSize: "14px", fontWeight: 700, color: "#475569", cursor: "pointer" }}>
-                <Plus className="w-4 h-4" /> Agregar sesión
+            <div className="mt-2.5 flex gap-2">
+              <button
+                type="button"
+                onClick={addBloque}
+                className="flex h-[28px] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[5px] border border-slate-300 bg-white text-[11px] font-bold uppercase tracking-wide text-slate-600 hover:bg-slate-50"
+              >
+                <Plus size={13} strokeWidth={2.5} /> Agregar sesión
               </button>
-              <button onClick={handleSave} disabled={!isFormValid || loading}
-                style={{ height: 44, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: isFormValid ? "#2563eb" : "#e2e8f0", color: "#fff", border: "none", borderRadius: 12, fontSize: "14px", fontWeight: 700, cursor: isFormValid ? "pointer" : "not-allowed" }}>
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Guardar horario</>}
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={!isFormValid || loading}
+                className="flex h-[28px] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[5px] bg-blue-600 text-[11px] font-bold uppercase tracking-wide text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+              >
+                {loading ? <Loader2 size={13} className="animate-spin" /> : <><Save size={13} strokeWidth={2.5} /> Guardar</>}
               </button>
             </div>
-          </div>
+          </Seccion>
 
           {message && (
-            <div style={{ padding: 12, borderRadius: 12, fontSize: 13, fontWeight: 600, background: message.isError ? "#fef2f2" : "#f0fdf4", color: message.isError ? "#ef4444" : "#16a34a", border: `1px solid ${message.isError ? "#fecaca" : "#bbf7d0"}` }}>
+            <div className={`rounded-[5px] border px-2.5 py-2 text-xs font-semibold ${message.isError ? "border-red-200 bg-red-50 text-red-600" : "border-green-200 bg-green-50 text-green-700"}`}>
               {message.text}
             </div>
           )}
         </div>
 
-        <div style={{ padding: "40px", background: "#f8fafc" }}>
+        <div className="min-w-0 px-4 py-6">
+          <div className="rounded-md border border-slate-300 bg-white">
 
-          <div style={{ background: "#fff", border: "1px solid #f1f5f9", borderRadius: "28px", padding: "28px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.03)" }}>
-
-            {/* Calendar Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 24 }}>
-              <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                <div style={{ width: 44, height: 44, background: "#000", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-                  <Calendar className="w-5 h-5" />
+            {/* Cabecera del calendario */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-3 py-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-blue-100 text-blue-600">
+                  <Calendar size={16} strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 800, color: "#0f172a" }}>
+                  <div className="text-[13px] font-extrabold text-slate-900">
                     {!idDocente ? "Seleccione un docente" : docentes.find(d => String(d.id) === idDocente)?.nombre_completo}
-                  </h2>
-                  <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", fontWeight: 500 }}>
+                  </div>
+                  <div className="text-[11px] text-slate-500">
                     Vista semanal · Período {periodos.find(p => String(p.id) === idPeriodo)?.anio || "2026"}
-                  </p>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: 16 }}>
+              <div className="flex flex-wrap items-center gap-3">
                 {[
-                  { color: "#cbd5e1", label: "Ocupado" },
-                  { color: "#10b981", label: "Nuevo" },
-                  { color: "#ef4444", label: "Conflicto" },
-                ].map(({ color, label }) => (
-                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ width: 10, height: 10, background: color, borderRadius: "50%" }} />
-                    <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b" }}>{label}</span>
+                  { clase: "bg-emerald-100 border-emerald-500", label: "Docente ocupado" },
+                  { clase: "bg-amber-100 border-amber-500", label: "Grado ocupado" },
+                  { clase: "bg-blue-100 border-blue-500", label: "Nueva sesión" },
+                  { clase: "bg-red-100 border-red-500", label: "Conflicto" },
+                ].map(({ clase, label }) => (
+                  <div key={label} className="flex items-center gap-1.5">
+                    <span className={`h-2.5 w-2.5 rounded-[3px] border-l-[3px] ${clase}`} />
+                    <span className="text-[11px] font-medium text-slate-600">{label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div style={{ padding: "8px 0", borderTop: "1px solid #f1f5f9", marginBottom: 12 }}>
-              <p style={{ margin: 0, fontSize: "12px", color: "#94a3b8", display: "flex", alignItems: "center", gap: 8 }}>
-                <Check className="w-3.5 h-3.5" /> {pickState ? "Suelte para confirmar" : ""}
-              </p>
+            <div className="flex h-7 items-center gap-1.5 border-b border-slate-100 px-3 text-[11px] text-slate-500">
+              <Check size={12} />
+              {pickState
+                ? "Suelte para confirmar la sesión"
+                : formOk
+                  ? "Haga clic y arrastre sobre un día para crear una sesión"
+                  : "Seleccione docente, grado y curso para crear sesiones"}
             </div>
 
-            {/* Calendar Grid Wrapper */}
-            <div style={{ background: "linear-gradient(to right, #fcfcfc, #fff)", border: "1px solid #f1f5f9", borderRadius: "16px", overflow: "hidden" }}>
-              <div style={{ overflowY: "auto", maxHeight: "60vh", position: "relative" }}>
+            {/* Calendario */}
+            <div className="max-h-[62vh] overflow-y-auto select-none">
+              <div className="sticky top-0 z-10 flex border-b border-slate-200 bg-slate-50">
+                <div className="w-12 shrink-0" />
+                {DIAS.map((dia, di) => (
+                  <div key={dia} className="flex-1 border-l border-slate-200 py-1.5 text-center">
+                    <div className="text-[11px] font-bold text-slate-700">{dia === "Miercoles" ? "Miércoles" : dia}</div>
+                    <div className="text-[10px] font-semibold text-slate-400">{DIAS_SHORT[di]}</div>
+                  </div>
+                ))}
+              </div>
 
-                {/* Headers */}
-                <div style={{ display: "flex", borderBottom: "1px solid #f1f5f9", position: "sticky", top: 0, zIndex: 10, background: "#fff" }}>
-                  <div style={{ width: 60, flexShrink: 0 }} />
-                  {DIAS.map((dia, di) => (
-                    <div key={dia} style={{ flex: 1, padding: "12px 10px", textAlign: "center", borderLeft: "1px solid #e2e8f0" }}>
-                      <p style={{ margin: 0, fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase" }}>{dia.slice(0, 3)}</p>
-                      <p style={{ margin: "2px 0 0", fontSize: "14px", fontWeight: 800, color: "#1e293b" }}>{DIAS_SHORT[di]}</p>
-                    </div>
+              <div className="flex">
+                {/* Eje de horas */}
+                <div className="relative w-12 shrink-0" style={{ height: TOTAL_H }}>
+                  {HORAS.map((h, hi) => (
+                    (h.endsWith(":00") || h.endsWith(":30")) && hi < HORAS.length - 1 && (
+                      <div
+                        key={h}
+                        className={`absolute right-1.5 font-mono text-[10px] ${h.endsWith(":00") ? "font-bold text-slate-600" : "text-slate-400"}`}
+                        style={{ top: timeToTop(h) - 6 }}
+                      >
+                        {h}
+                      </div>
+                    )
                   ))}
                 </div>
 
-                <div style={{ display: "flex" }}>
-                  {/* Axis */}
-                  <div style={{ width: 60, flexShrink: 0, position: "relative", height: TOTAL_H, borderRight: "1px solid #e2e8f0" }}>
-                    {HORAS.map((h, hi) => (
-                      (h.endsWith(":00") || h.endsWith(":30")) && hi < HORAS.length - 1 && (
-                        <div key={h} style={{ position: "absolute", top: timeToTop(h) - 7, left: 0, right: 8, display: "flex", justifyContent: "flex-end", fontSize: "11px", fontWeight: 700, color: "#64748b" }}>{h}</div>
-                      )
-                    ))}
-                  </div>
+                {/* Columnas por día */}
+                <div className="grid flex-1 grid-cols-5">
+                  {DIAS.map((dia) => {
+                    const dayOcupados = ocupados.filter(o => o.dia === dia);
+                    const dayNuevos = formOk ? bloques.filter(b => b.dia_semana === dia) : [];
 
-                  {/* Columns */}
-                  <div style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(5, 1fr)", background: "#fff" }}>
-                    {DIAS.map((dia) => {
-                      const dayOcupados = ocupados.filter(o => o.dia === dia);
-                      const dayNuevos = formOk ? bloques.filter(b => b.dia_semana === dia) : [];
-
-                      return (
-                        <div key={dia} style={{ position: "relative", borderLeft: "1px solid #1A1818" }}>
-                          {/* Grid Lines */}
-                          {HORAS.map((h, i) => (
-                            <div key={h} style={{ position: "absolute", top: timeToTop(h), left: 0, right: 0, height: PX_PER_SLOT, borderBottom: i % 2 === 0 ? "1px dashed #1A1818" : "1px solid #1A1818", zIndex: 0 }}
-                              onMouseDown={() => {
-                                const iso = dayOcupados.some(o => toMin(o.horaInicio) <= toMin(h) && toMin(h) < toMin(o.horaFin));
-                                if (!iso) handleSlotMouseDown(dia, h);
-                              }}
-                              onMouseEnter={() => handleSlotMouseEnter(dia, h)} />
-                          ))}
-
-                          {/* Ocupados */}
-                          {dayOcupados.map((o, oi) => {
-                            const top = timeToTop(o.horaInicio);
-                            const height = timeToPx(o.horaInicio, o.horaFin);
-                            return (
-                              <div key={oi} style={{ position: "absolute", top, left: 6, right: 6, height: height - 2, background: o.isGradoConflict ? "#fef3c7" : "#dcfce7", borderLeft: `4px solid ${o.isGradoConflict ? "#f59e0b" : "#10b981"}`, borderRadius: "4px 8px 8px 4px", zIndex: 1, padding: "4px 8px", pointerEvents: "none", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                                <p style={{ margin: 0, fontSize: "9px", fontWeight: 800, color: o.isGradoConflict ? "#92400e" : "#065f46", textTransform: "uppercase", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{o.curso}</p>
-                                <p style={{ margin: "1px 0", fontSize: "8px", fontWeight: 600, color: o.isGradoConflict ? "#b45309" : "#059669" }}>{o.grado}</p>
-                                <p style={{ margin: 0, fontSize: "8px", opacity: 0.8, color: "inherit" }}>{o.horaInicio}-{o.horaFin}</p>
-                              </div>
-                            );
-                          })}
-
-                          {/* Recreo visual block */}
+                    return (
+                      <div key={dia} className="relative border-l border-slate-200" style={{ height: TOTAL_H }}>
+                        {/* Bloques de 15 min: se arrastra sobre ellos */}
+                        {HORAS.slice(0, -1).map((h) => (
                           <div
-                            style={{
-                              position: "absolute",
-                              top: timeToTop("11:00"),
-                              height: timeToPx("11:00", "11:30"),
-                              left: 0,
-                              right: 0,
-                              background: "#180469",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              zIndex: 1,
-                              borderTop: "1px solid #e2e8f0",
-                              borderBottom: "1px solid #e2e8f0",
-                              pointerEvents: "none"
+                            key={h}
+                            className={`absolute left-0 right-0 border-b ${formOk ? "cursor-pointer hover:bg-blue-50" : ""} ${h.endsWith(":45") ? "border-slate-200" : "border-dashed border-slate-100"}`}
+                            style={{ top: timeToTop(h), height: PX_PER_SLOT }}
+                            onMouseDown={() => {
+                              const iso = dayOcupados.some(o => toMin(o.horaInicio) <= toMin(h) && toMin(h) < toMin(o.horaFin));
+                              if (!iso) handleSlotMouseDown(dia, h);
                             }}
-                          >
-                            {dia === "Miercoles" && (
-                              <span style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "1em", color: "#cbd5e1" }}>RECREO</span>
-                            )}
-                          </div>
+                            onMouseEnter={() => handleSlotMouseEnter(dia, h)}
+                          />
+                        ))}
 
-                          {/* Nuevos */}
-                          {dayNuevos.map((b) => {
-                            const top = timeToTop(b.hora_inicio);
-                            const height = timeToPx(b.hora_inicio, b.hora_fin);
-                            const conf = conflicts[bloques.indexOf(b)];
-                            return (
-                              <div key={b.id} style={{ position: "absolute", top, left: 4, right: 4, height: height - 2, background: conf ? "#fee2e2" : "#eff6ff", borderLeft: `4px solid ${conf ? "#ef4444" : "#3b82f6"}`, borderRadius: "4px 8px 8px 4px", zIndex: 2, padding: "6px 8px", pointerEvents: "none", boxShadow: "0 4px 12px rgba(59,130,246,0.1)" }}>
-                                <p style={{ margin: 0, fontSize: "10px", fontWeight: 900, color: conf ? "#991b1b" : "#1e40af" }}>{conf ? "CONF" : idCurso ? cursosDisponibles.find(c => String(c.id) === idCurso)?.nombre?.slice(0, 10) : "NUEVO"}</p>
-                                <p style={{ margin: 0, fontSize: "9px", fontWeight: 600, color: conf ? "#ef4444" : "#3b82f6" }}>{b.hora_inicio}-{b.hora_fin}</p>
-                              </div>
-                            );
-                          })}
+                        {/* Recreo */}
+                        <div
+                          className="pointer-events-none absolute left-0 right-0 z-[1] flex items-center justify-center border-y border-slate-300 bg-[repeating-linear-gradient(135deg,#f1f5f9_0,#f1f5f9_6px,#e2e8f0_6px,#e2e8f0_12px)]"
+                          style={{ top: timeToTop("11:00"), height: timeToPx("11:00", "11:30") }}
+                        >
+                          <span className="text-[10px] font-bold tracking-[0.3em] text-slate-500">RECREO</span>
                         </div>
-                      );
-                    })}
-                  </div>
+
+                        {/* Ocupados: del docente (verde) o del grado (ámbar) */}
+                        {dayOcupados.map((o, oi) => (
+                          <div
+                            key={oi}
+                            className={`pointer-events-none absolute left-1 right-1 z-[1] overflow-hidden rounded-[5px] border-l-[3px] px-1.5 py-0.5 ${o.isGradoConflict ? "border-amber-500 bg-amber-100 text-amber-800" : "border-emerald-500 bg-emerald-100 text-emerald-800"}`}
+                            style={{ top: timeToTop(o.horaInicio) + 1, height: timeToPx(o.horaInicio, o.horaFin) - 2 }}
+                            title={`${o.curso} · ${o.grado} · ${o.docente}`}
+                          >
+                            <div className="truncate text-[10px] font-bold uppercase">{o.curso}</div>
+                            <div className="truncate text-[9.5px]">{o.grado} · {o.horaInicio.slice(0, 5)}-{o.horaFin.slice(0, 5)}</div>
+                          </div>
+                        ))}
+
+                        {/* Sesiones nuevas */}
+                        {dayNuevos.map((b) => {
+                          const conf = conflicts[bloques.indexOf(b)];
+                          return (
+                            <div
+                              key={b.id}
+                              className={`pointer-events-none absolute left-1 right-1 z-[2] overflow-hidden rounded-[5px] border-l-[3px] px-1.5 py-0.5 shadow-sm ${conf ? "border-red-500 bg-red-100 text-red-800" : "border-blue-500 bg-blue-100 text-blue-800"}`}
+                              style={{ top: timeToTop(b.hora_inicio) + 1, height: timeToPx(b.hora_inicio, b.hora_fin) - 2 }}
+                            >
+                              <div className="truncate text-[10px] font-bold uppercase">
+                                {conf ? "Conflicto" : cursosDisponibles.find(c => String(c.id) === idCurso)?.nombre || "Nueva sesión"}
+                              </div>
+                              <div className="font-mono text-[9.5px]">{b.hora_inicio}-{b.hora_fin}</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-
-            {/* Bottom: Clases Registradas */}
-            <div style={{ marginTop: 28, borderTop: "1px solid #f1f5f9", paddingTop: 20 }}>
-              <p style={{ margin: "0 0 16px", fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "#94a3b8" }}>HORARIOS REGISTRADOS DEL DOCENTE</p>
-
-              {registrados.length === 0 ? (
-                <p style={{ margin: 0, fontSize: 13, color: "#cbd5e1", fontStyle: "italic" }}>No hay registros previos para este período</p>
-              ) : (
-                <div style={{ overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                    <thead>
-                      <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                        {["Grado", "Curso", "Día", "Inicio", "Fin", "Aula", ""].map(h => (
-                          <th key={h} style={{ padding: "8px 12px", textAlign: "left", fontWeight: 700, color: "#64748b", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {registrados.map((r, i) => (
-                        <tr key={r.id_horario} style={{ borderBottom: "1px solid #f1f5f9", background: i % 2 === 0 ? "#fff" : "#fcfcfc" }}>
-                          <td style={{ padding: "8px 12px", color: "#334155", fontWeight: 600 }}>{r.grado}</td>
-                          <td style={{ padding: "8px 12px", color: "#334155" }}>{r.curso}</td>
-                          <td style={{ padding: "8px 12px", color: "#334155" }}>{r.dia_semana}</td>
-                          <td style={{ padding: "8px 12px", color: "#334155", fontFamily: "monospace" }}>{r.hora_inicio.slice(0, 5)}</td>
-                          <td style={{ padding: "8px 12px", color: "#334155", fontFamily: "monospace" }}>{r.hora_fin.slice(0, 5)}</td>
-                          <td style={{ padding: "8px 12px", color: "#94a3b8" }}>{r.aula || "—"}</td>
-                          <td style={{ padding: "8px 12px" }}>
-                            <button
-                              onClick={() => handleDeleteHorario(r.id_horario)}
-                              disabled={deletingId === r.id_horario}
-                              title="Eliminar bloque"
-                              style={{
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                width: 28, height: 28, background: "#fef2f2", border: "1px solid #fecaca",
-                                borderRadius: 6, cursor: deletingId === r.id_horario ? "not-allowed" : "pointer",
-                                color: "#ef4444", opacity: deletingId === r.id_horario ? 0.5 : 1,
-                              }}
-                            >
-                              {deletingId === r.id_horario
-                                ? <Loader2 style={{ width: 12, height: 12, animation: "spin 1s linear infinite" }} />
-                                : <Trash2 style={{ width: 12, height: 12 }} />}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
           </div>
+
+          {/* Horarios registrados del docente */}
+          <fieldset className="mt-3 rounded-md border border-slate-300 bg-white p-2.5">
+            <legend className="px-1 text-xs font-semibold text-slate-700">Horarios registrados del docente</legend>
+
+            {registrados.length === 0 ? (
+              <p className="py-2 text-xs text-slate-400">No hay registros previos para este período.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-100 text-left text-[11px] font-semibold text-slate-600">
+                      {["Grado", "Curso", "Día", "Inicio", "Fin", "Aula", ""].map(h => (
+                        <th key={h} className="px-2 py-1">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {registrados.map((r) => (
+                      <tr key={r.id_horario} className="border-t border-slate-100 hover:bg-slate-50">
+                        <td className="px-2 py-1 font-semibold text-slate-700">{r.grado}</td>
+                        <td className="px-2 py-1 text-slate-700">{r.curso}</td>
+                        <td className="px-2 py-1 text-slate-700">{r.dia_semana === "Miercoles" ? "Miércoles" : r.dia_semana}</td>
+                        <td className="px-2 py-1 font-mono text-slate-700">{r.hora_inicio.slice(0, 5)}</td>
+                        <td className="px-2 py-1 font-mono text-slate-700">{r.hora_fin.slice(0, 5)}</td>
+                        <td className="px-2 py-1 text-slate-500">{r.aula || "—"}</td>
+                        <td className="px-2 py-1 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHorario(r.id_horario)}
+                            disabled={deletingId === r.id_horario}
+                            title="Eliminar bloque"
+                            className="inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[5px] text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {deletingId === r.id_horario
+                              ? <Loader2 size={12} className="animate-spin" />
+                              : <Trash2 size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </fieldset>
         </div>
       </div>
     </div>

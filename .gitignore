@@ -26,3 +26,4 @@ dist-ssr
 skill.md
 .env
 seed_students.js
+.env.production

@@ -9,6 +9,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Constantes para rate limiting
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5 minutos
+// TODO: volver a true cuando termine el desarrollo local
+const BLOQUEO_ACTIVO = false;
 
 export default function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -24,6 +26,12 @@ export default function Login() {
 
   // Cargar intentos desde localStorage al montar
   useEffect(() => {
+    if (!BLOQUEO_ACTIVO) {
+      localStorage.removeItem("loginAttempts");
+      localStorage.removeItem("lockoutTime");
+      return;
+    }
+
     const storedAttempts = localStorage.getItem("loginAttempts");
     const storedLockoutTime = localStorage.getItem("lockoutTime");
 
@@ -83,7 +91,7 @@ export default function Login() {
     setError(null);
 
     // Verificar si está bloqueado
-    if (isLocked) {
+    if (BLOQUEO_ACTIVO && isLocked) {
       const minutes = Math.ceil(remainingTime / 60);
       setError(`Cuenta bloqueada. Intente nuevamente en ${minutes} minuto(s).`);
       return;
@@ -134,14 +142,16 @@ export default function Login() {
       localStorage.setItem("loginAttempts", newAttempts.toString());
 
       // Verificar si se debe bloquear
-      if (newAttempts >= MAX_LOGIN_ATTEMPTS) {
+      if (BLOQUEO_ACTIVO && newAttempts >= MAX_LOGIN_ATTEMPTS) {
         const lockoutEnd = Date.now() + LOCKOUT_DURATION_MS;
         setIsLocked(true);
         setLockoutTime(lockoutEnd);
         localStorage.setItem("lockoutTime", lockoutEnd.toString());
         setError(`Demasiados intentos fallidos. Cuenta bloqueada por 5 minutos.`);
       } else {
-        const remaining = MAX_LOGIN_ATTEMPTS - newAttempts;
+        const intentosRestantes = BLOQUEO_ACTIVO
+          ? ` ${MAX_LOGIN_ATTEMPTS - newAttempts} intento(s) restante(s).`
+          : "";
 
         if (error && typeof error === 'object' && 'response' in error) {
           const axiosError = error as {
@@ -183,13 +193,13 @@ export default function Login() {
 
           // Mensaje de error sanitizado
           if (status === 401) {
-            setError(`Usuario o contraseña incorrectos. ${remaining} intento(s) restante(s).`);
+            setError(`Usuario o contraseña incorrectos.${intentosRestantes}`);
           } else if (status === 403) {
             setError("Acceso denegado. Contacte al administrador.");
           } else if (status >= 500) {
             setError("Error del servidor. Por favor, intente más tarde.");
           } else {
-            setError(`Error de autenticación. ${remaining} intento(s) restante(s).`);
+            setError(`Error de autenticación.${intentosRestantes}`);
           }
         } else {
           setError("Error de conexión. Verifique su conexión a internet.");

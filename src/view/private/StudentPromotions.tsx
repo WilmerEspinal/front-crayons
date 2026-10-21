@@ -4,8 +4,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { CheckCircle2, AlertTriangle, X, AlertCircle } from "lucide-react";
 
 const estadoBadge = (estado: string) => {
-  if (estado?.toLowerCase() === "activo") return { label: "Activo", bg: "#e8f5e9", color: "#2e7d32" };
-  if (estado?.toLowerCase() === "egresado") return { label: "Egresado", bg: "#fff3e0", color: "#e65100" };
+  if (estado === "AC" || estado?.toLowerCase() === "activo") return { label: "Activo", bg: "#e8f5e9", color: "#2e7d32" };
+  if (estado === "EG" || estado?.toLowerCase() === "egresado") return { label: "Egresado", bg: "#fff3e0", color: "#e65100" };
   if (estado?.toLowerCase() === "inactivo") return { label: "Sin acceso", bg: "#fce4ec", color: "#c62828" };
   if (estado?.toLowerCase() === "promovido") return { label: "Promovido", bg: "#eff6ff", color: "#2563eb" };
   return { label: estado, bg: "#f5f5f5", color: "#555" };
@@ -154,7 +154,7 @@ export default function PromocionAlumnos() {
     return ["Todas", ...s.sort()];
   }, [alumnos]);
 
-  const egresados = useMemo(() => alumnos.filter((a) => a.alumno_estado?.toLowerCase() === "egresado"), [alumnos]);
+  const egresados = useMemo(() => alumnos.filter((a) => a.alumno_estado === "EG"), [alumnos]);
 
   const toggleSeleccion = (id: number) => {
     setSeleccionados((prev) =>

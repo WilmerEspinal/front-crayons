@@ -114,6 +114,14 @@ interface ErrorResponse {
   message: string;
 }
 
+/**
+ * Indica si un campo de texto se guarda en mayusculas. Quedan fuera correos, fechas y el sexo (codigo M/F).
+ * @param {string} campo - nombre del campo del formulario o del payload
+ * @returns {boolean}
+ */
+const esCampoMayuscula = (campo: string) =>
+  !campo.includes("email") && !campo.includes("fecha") && !campo.includes("sexo");
+
 export default function RegisterStudent() {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
@@ -473,7 +481,8 @@ export default function RegisterStudent() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked :
-      (type === "number" && !name.includes('dni') && !name.includes('telefono')) ? Number(value) : value;
+      (type === "number" && !name.includes('dni') && !name.includes('telefono')) ? Number(value) :
+      esCampoMayuscula(name) ? value.toUpperCase() : value;
 
     setFormData(prev => {
       const newFormData = {
@@ -813,6 +822,16 @@ export default function RegisterStudent() {
           partida_nacimiento: formData.partida_nacimiento
         }
       };
+
+      // Los datos que llegan de RENIEC o del PDF no pasan por handleInputChange
+      (["estudiante", "padre", "madre"] as const).forEach((seccion) => {
+        const datos = payload[seccion] as Record<string, unknown>;
+        Object.keys(datos).forEach((campo) => {
+          if (typeof datos[campo] === "string" && esCampoMayuscula(campo)) {
+            datos[campo] = (datos[campo] as string).toUpperCase();
+          }
+        });
+      });
 
       const token = localStorage.getItem("token");
       const response = await axios.post(

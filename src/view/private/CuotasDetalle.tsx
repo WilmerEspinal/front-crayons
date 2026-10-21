@@ -478,7 +478,7 @@ const CuotasDetalle = () => {
                       <p className="text-gray-500 font-medium">{datosEstudiante.grado}</p>
                       <div className="flex flex-wrap justify-center gap-2 mt-2">
                         <Badge variant="outline">DNI: {datosEstudiante.dni}</Badge>
-                        {datosEstudiante.detalle[0]?.alumno_estado !== 'Activo' && (
+                        {datosEstudiante.detalle[0]?.alumno_estado !== 'AC' && (
                           <Badge variant="destructive" className="animate-pulse">
                             {datosEstudiante.detalle[0]?.alumno_estado?.toUpperCase() || 'INACTIVO'}
                           </Badge>
@@ -489,11 +489,11 @@ const CuotasDetalle = () => {
                       </div>
                     </div>
 
-                    {(datosEstudiante.detalle[0]?.periodo_activo === 0 || datosEstudiante.detalle[0]?.alumno_estado !== 'Activo') && (
+                    {(datosEstudiante.detalle[0]?.periodo_activo === 0 || datosEstudiante.detalle[0]?.alumno_estado !== 'AC') && (
                       <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-2">
                         <div className="mt-0.5">⚠️</div>
                         <p>
-                          {datosEstudiante.detalle[0]?.alumno_estado !== 'Activo'
+                          {datosEstudiante.detalle[0]?.alumno_estado !== 'AC'
                             ? `Este estudiante figura como ${datosEstudiante.detalle[0]?.alumno_estado || 'Inactivo'}. Los cobros manuales están deshabilitados.`
                             : 'El periodo académico está inactivo. Solo se pueden registrar pagos en periodos activos.'}
                         </p>
@@ -533,7 +533,7 @@ const CuotasDetalle = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              disabled={matriculaInfo.periodo_activo === 0 || matriculaInfo.alumno_estado !== 'Activo'}
+                              disabled={matriculaInfo.periodo_activo === 0 || matriculaInfo.alumno_estado !== 'AC'}
                               onClick={() => {
                                 setMontoPagadoReq(matriculaInfo.monto);
                                 setMetodoPago('Efectivo');
@@ -601,7 +601,7 @@ const CuotasDetalle = () => {
                                     variant="ghost"
                                     size="sm"
                                     className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 disabled:opacity-30"
-                                    disabled={cuota.periodo_activo === 0 || cuota.alumno_estado !== 'Activo'}
+                                    disabled={cuota.periodo_activo === 0 || cuota.alumno_estado !== 'AC'}
                                     onClick={() => {
                                       setCuotaSeleccionada(cuota);
                                       setMontoPagadoReq(cuota.monto);
