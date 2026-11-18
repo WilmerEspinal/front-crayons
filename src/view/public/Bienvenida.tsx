@@ -90,7 +90,7 @@ const Bienvenida = () => {
                             </div>
 
                             <div className="pt-8 flex flex-col sm:flex-row gap-8 sm:items-center">
-                                <Link to="/admision" className="bg-slate-900 text-white px-8 py-4 rounded-full text-xs font-black uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-center gap-2 group">
+                                <Link to="/admision" className="bg-slate-900 text-white px-8 py-4 rounded-[10px] text-xs font-black uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center justify-center gap-2 group">
                                     Solicitar Información <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <div className="flex -space-x-3 overflow-hidden">

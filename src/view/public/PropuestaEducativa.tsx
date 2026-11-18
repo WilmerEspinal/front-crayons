@@ -97,7 +97,7 @@ const PropuestaEducativa = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                         <div className="flex gap-8 overflow-x-auto pb-4 md:pb-0 font-bold text-[10px] uppercase tracking-widest text-slate-400">
                             {['Todos', 'Innovación', 'Psicología', 'Vida Crayon', 'Eventos'].map((cat, i) => (
-                                <button key={i} className={`whitespace-nowrap hover:text-orange-600 transition-colors ${i === 0 ? 'text-slate-900' : ''}`}>
+                                <button key={i} className={`rounded-[10px] whitespace-nowrap hover:text-orange-600 transition-colors ${i === 0 ? 'text-slate-900' : ''}`}>
                                     {cat}
                                 </button>
                             ))}
@@ -106,7 +106,7 @@ const PropuestaEducativa = () => {
                             <input
                                 type="text"
                                 placeholder="Buscar historias..."
-                                className="w-full md:w-96 pl-6 pr-12 py-3 rounded-full bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-xs text-slate-900 font-medium"
+                                className="w-full md:w-96 pl-6 pr-12 py-3 rounded-[4px] bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-xs text-slate-900 font-medium"
                             />
                             <Search size={16} className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300" />
                         </div>
@@ -125,7 +125,7 @@ const PropuestaEducativa = () => {
                                     <div className="absolute top-8 left-8 bg-white/90 backdrop-blur-sm px-6 py-2 rounded-full shadow-lg">
                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">{post.category}</span>
                                     </div>
-                                    <button className="absolute bottom-8 right-8 w-12 h-12 rounded-full bg-white text-slate-900 flex items-center justify-center translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
+                                    <button className="absolute bottom-8 right-8 w-12 h-12 rounded-[10px] bg-white text-slate-900 flex items-center justify-center translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
                                         <Bookmark size={18} />
                                     </button>
                                 </div>
@@ -140,7 +140,7 @@ const PropuestaEducativa = () => {
                                     <h3 className="text-2xl font-serif text-slate-900 leading-tight group-hover:text-orange-600 transition-colors">{post.title}</h3>
                                     <p className="text-sm text-slate-500 font-light leading-relaxed line-clamp-2">{post.desc}</p>
                                     <div className="pt-4">
-                                        <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:text-orange-600 transition-colors">
+                                        <button className="rounded-[10px] flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:text-orange-600 transition-colors">
                                             Leer Historia <ArrowUpRight size={14} />
                                         </button>
                                     </div>
@@ -150,7 +150,7 @@ const PropuestaEducativa = () => {
                     </div>
 
                     <div className="mt-40 text-center">
-                        <button className="px-12 py-5 rounded-full border-2 border-slate-900 text-slate-900 text-[11px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all">
+                        <button className="px-12 py-5 rounded-[10px] border-2 border-slate-900 text-slate-900 text-[11px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all">
                             Cargar más historias
                         </button>
                     </div>
@@ -174,9 +174,9 @@ const PropuestaEducativa = () => {
                             <input
                                 type="email"
                                 placeholder="Su correo electrónico"
-                                className="flex-1 px-8 py-5 rounded-full bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-xs"
+                                className="flex-1 px-8 py-5 rounded-[4px] bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-orange-500/20 text-xs"
                             />
-                            <button className="bg-orange-600 text-white px-10 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all">
+                            <button className="bg-orange-600 text-white px-10 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-700 transition-all">
                                 Suscribirme
                             </button>
                         </form>

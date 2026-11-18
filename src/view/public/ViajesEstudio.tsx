@@ -156,10 +156,10 @@ const ViajesEstudio = () => {
                             ¿A dónde nos llevará <br /> la próxima <span className="italic text-orange-600">curiosidad?</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
+                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
                                 Ver Calendario 2026
                             </Link>
-                            <Link to="/contacto" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-[#0D101C] border-2 border-[#0D101C] hover:bg-[#0D101C] hover:text-white transition-all">
+                            <Link to="/contacto" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-[#0D101C] border-2 border-[#0D101C] hover:bg-[#0D101C] hover:text-white transition-all">
                                 Consultar Requisitos
                             </Link>
                         </div>

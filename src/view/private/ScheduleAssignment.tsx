@@ -512,7 +512,7 @@ export default function ScheduleAssignment() {
                             type="button"
                             onClick={() => removeBloque(sl.id)}
                             title="Quitar sesión"
-                            className="flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[5px] text-red-500 hover:bg-red-50"
+                            className="flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[10px] text-red-500 hover:bg-red-50"
                           >
                             <Trash2 size={13} />
                           </button>
@@ -531,7 +531,7 @@ export default function ScheduleAssignment() {
               <button
                 type="button"
                 onClick={addBloque}
-                className="flex h-[28px] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[5px] border border-slate-300 bg-white text-[11px] font-bold uppercase tracking-wide text-slate-600 hover:bg-slate-50"
+                className="flex h-[28px] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[10px] border border-slate-300 bg-white text-[11px] font-bold uppercase tracking-wide text-slate-600 hover:bg-slate-50"
               >
                 <Plus size={13} strokeWidth={2.5} /> Agregar sesión
               </button>
@@ -539,7 +539,7 @@ export default function ScheduleAssignment() {
                 type="button"
                 onClick={handleSave}
                 disabled={!isFormValid || loading}
-                className="flex h-[28px] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[5px] bg-blue-600 text-[11px] font-bold uppercase tracking-wide text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                className="flex h-[28px] flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[10px] bg-blue-600 text-[11px] font-bold uppercase tracking-wide text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
               >
                 {loading ? <Loader2 size={13} className="animate-spin" /> : <><Save size={13} strokeWidth={2.5} /> Guardar</>}
               </button>
@@ -722,7 +722,7 @@ export default function ScheduleAssignment() {
                             onClick={() => handleDeleteHorario(r.id_horario)}
                             disabled={deletingId === r.id_horario}
                             title="Eliminar bloque"
-                            className="inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[5px] text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[10px] text-red-500 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {deletingId === r.id_horario
                               ? <Loader2 size={12} className="animate-spin" />

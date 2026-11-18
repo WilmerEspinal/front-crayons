@@ -100,7 +100,7 @@ const EarlyYears = () => {
                             </div>
 
                             <div className="pt-8">
-                                <Link to="/admision" className="bg-rose-500 text-white px-10 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-200">
+                                <Link to="/admision" className="bg-rose-500 text-white px-10 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-rose-600 transition-all shadow-xl shadow-rose-200">
                                     Programar Visita
                                 </Link>
                             </div>
@@ -177,10 +177,10 @@ const EarlyYears = () => {
                                 Concierte una visita personalizada y descubra cómo el nivel Inicial de Crayon's puede encender la chispa del aprendizaje perpetuo en su pequeño.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
-                                <Link to="/admision" className="bg-slate-900 text-white px-10 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-center">
+                                <Link to="/admision" className="bg-slate-900 text-white px-10 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-center">
                                     Admisiones 2026
                                 </Link>
-                                <button className="px-10 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-100 hover:border-rose-200 transition-all flex items-center justify-center gap-2">
+                                <button className="px-10 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-100 hover:border-rose-200 transition-all flex items-center justify-center gap-2">
                                     WhatsApp <Sun size={14} className="text-rose-400" />
                                 </button>
                             </div>

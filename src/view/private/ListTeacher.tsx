@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "@/lib/axios"; // instancia con el token del usuario
 import { Download, Loader2, ChevronDown, ChevronUp, UserX, UserCheck } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -229,7 +229,7 @@ export default function ListTeacher() {
             onClick={handleExportar}
             style={{
               display: "flex", alignItems: "center", gap: 6,
-              background: "#f3f4f6", border: "1px solid #d1d5db", borderRadius: 7,
+              background: "#f3f4f6", border: "1px solid #d1d5db", borderRadius: 10,
               padding: "7px 14px", fontSize: 13, fontWeight: 600, color: "#111827",
               cursor: "pointer",
             }}
@@ -244,7 +244,7 @@ export default function ListTeacher() {
               value={anioSeleccionado}
               onChange={(e) => setAnioSeleccionado(e.target.value)}
               style={{
-                border: "1px solid #e2e4e9", borderRadius: 6, padding: "6px 10px",
+                border: "1px solid #e2e4e9", borderRadius: 4, padding: "6px 10px",
                 fontSize: 13, fontWeight: 600, color: "#374151", background: "#f9fafb", outline: "none",
               }}
             >
@@ -262,7 +262,7 @@ export default function ListTeacher() {
               onClick={handleSearch}
               disabled={isLoading}
               style={{
-                background: "#1d4ed8", color: "#fff", border: "none", borderRadius: 7,
+                background: "#1d4ed8", color: "#fff", border: "none", borderRadius: 10,
                 padding: "7px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer",
                 display: "flex", alignItems: "center", gap: 6, opacity: isLoading ? 0.7 : 1,
               }}
@@ -369,7 +369,7 @@ export default function ListTeacher() {
                         padding: "4px 12px",
                         fontSize: 11,
                         fontWeight: 700,
-                        borderRadius: 6,
+                        borderRadius: 10,
                         border: "none",
                         cursor: currentPeriodoActivo === 0 ? "not-allowed" : "pointer",
                         textTransform: "uppercase",
@@ -473,7 +473,7 @@ export default function ListTeacher() {
             {modalConfig.showCancel && (
               <button
                 onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
-                className="flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
+                className="rounded-[10px] flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
               >
                 {modalConfig.cancelText || "Cancelar"}
               </button>
@@ -483,7 +483,7 @@ export default function ListTeacher() {
                 if (modalConfig.onConfirm) modalConfig.onConfirm();
                 setModalConfig(prev => ({ ...prev, isOpen: false }));
               }}
-              className={`flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
+              className={`rounded-[10px] flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
                 }`}
             >
               {modalConfig.confirmText || "Aceptar"}

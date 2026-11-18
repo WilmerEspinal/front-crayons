@@ -160,16 +160,16 @@ export default function JustificacionesDocente() {
         {/* Compact Filters row */}
         <div className="flex items-end justify-between">
           <div className="flex gap-4">
-            <div className="flex bg-slate-100 p-1 rounded-md h-8 self-end mr-4">
+            <div className="flex bg-slate-100 p-1 rounded-[10px] h-8 self-end mr-4">
               <button
                 onClick={() => setActiveTab("pendientes")}
-                className={`px-4 text-[11px] font-bold rounded-sm transition-all ${activeTab === "pendientes" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`px-4 text-[11px] font-bold rounded-[10px] transition-all ${activeTab === "pendientes" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
               >
                 Pendientes
               </button>
               <button
                 onClick={() => setActiveTab("historial")}
-                className={`px-4 text-[11px] font-bold rounded-sm transition-all ${activeTab === "historial" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                className={`px-4 text-[11px] font-bold rounded-[10px] transition-all ${activeTab === "historial" ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
               >
                 Historial
               </button>
@@ -183,7 +183,7 @@ export default function JustificacionesDocente() {
                     type="date"
                     value={fechaInput}
                     onChange={(e) => setFechaInput(e.target.value)}
-                    className="h-8 w-44 text-xs rounded-md bg-white border-slate-200"
+                    className="h-8 w-44 text-xs rounded-[4px] bg-white border-slate-200"
                   />
                 </div>
               </div>
@@ -193,7 +193,7 @@ export default function JustificacionesDocente() {
                 <select
                   value={estadoFiltro}
                   onChange={(e) => setEstadoFiltro(e.target.value as "Todos" | "Aprobada" | "Rechazada")}
-                  className="h-8 w-44 px-3 text-xs font-semibold text-slate-700 rounded-md bg-white border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-300"
+                  className="h-8 w-44 px-3 text-xs font-semibold text-slate-700 rounded-[4px] bg-white border border-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-300"
                 >
                   <option value="Todos">Todas las Justificaciones</option>
                   <option value="Aprobada">Solo Aprobadas</option>
@@ -313,13 +313,13 @@ export default function JustificacionesDocente() {
                               <>
                                 <button
                                   onClick={() => handleAccion(j, "aceptar")}
-                                  className="w-7 h-7 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
+                                  className="w-7 h-7 rounded-[10px] bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all active:scale-90"
                                 >
                                   <CheckCircle size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleAccion(j, "rechazar")}
-                                  className="w-7 h-7 rounded bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all active:scale-90"
+                                  className="w-7 h-7 rounded-[10px] bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center hover:bg-rose-600 hover:text-white transition-all active:scale-90"
                                 >
                                   <XCircle size={14} />
                                 </button>
@@ -370,7 +370,7 @@ export default function JustificacionesDocente() {
                 value={comentario}
                 onChange={(e) => setComentario(e.target.value)}
                 placeholder="Indique los motivos de la decisión..."
-                className="w-full min-h-[80px] p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-600 focus:bg-white focus:border-blue-500 transition-all outline-none resize-none placeholder:text-slate-300 shadow-inner"
+                className="w-full min-h-[80px] p-3 bg-slate-50 border border-slate-200 rounded-[4px] text-xs font-medium text-slate-600 focus:bg-white focus:border-blue-500 transition-all outline-none resize-none placeholder:text-slate-300 shadow-inner"
               />
             </div>
 

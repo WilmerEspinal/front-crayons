@@ -118,7 +118,7 @@ const HomePage = () => {
                 onMouseEnter={() => setActiveMegaMenu(item.title)}
                 onMouseLeave={() => setActiveMegaMenu(null)}
               >
-                <button className="flex items-center gap-1.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-800 hover:text-orange-600 transition-colors">
+                <button className="rounded-[10px] flex items-center gap-1.5 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-800 hover:text-orange-600 transition-colors">
                   {item.title}
                   <ChevronDown size={12} className={`transition-transform duration-300 ${activeMegaMenu === item.title ? "rotate-180 text-orange-600" : "text-slate-400"}`} />
                 </button>
@@ -151,13 +151,13 @@ const HomePage = () => {
             <div className="flex items-center gap-4 ml-4">
               <Link
                 to="/contacto"
-                className="px-5 py-2 rounded-full text-[11px] font-medium uppercase tracking-widest text-slate-900 border border-slate-200 hover:border-slate-900 transition-colors"
+                className="px-5 py-2 rounded-[10px] text-[11px] font-medium uppercase tracking-widest text-slate-900 border border-slate-200 hover:border-slate-900 transition-colors"
               >
                 Contacto
               </Link>
               <Link
                 to="/admision"
-                className="px-5 py-2 rounded-full text-[11px] font-medium uppercase tracking-widest text-white bg-orange-700 hover:bg-orange-800 shadow-[0_10px_20px_-10px_rgba(194,65,12,0.5)] hover:shadow-[0_10px_20px_-5px_rgba(194,65,12,0.6)] transition-all transform hover:-translate-y-0.5"
+                className="px-5 py-2 rounded-[10px] text-[11px] font-medium uppercase tracking-widest text-white bg-orange-700 hover:bg-orange-800 shadow-[0_10px_20px_-10px_rgba(194,65,12,0.5)] hover:shadow-[0_10px_20px_-5px_rgba(194,65,12,0.6)] transition-all transform hover:-translate-y-0.5"
               >
                 Admisión
               </Link>
@@ -166,7 +166,7 @@ const HomePage = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 -mr-2 text-slate-900 hover:text-orange-600 transition-colors"
+            className="rounded-[10px] lg:hidden p-2 -mr-2 text-slate-900 hover:text-orange-600 transition-colors"
             onClick={toggleMenu}
             aria-label="Toggle Menu"
           >
@@ -201,7 +201,7 @@ const HomePage = () => {
               loading="lazy"
               className="h-8 object-contain"
             />
-            <button onClick={toggleMenu} className="p-2 -mr-2 text-slate-400 hover:text-slate-900">
+            <button onClick={toggleMenu} className="rounded-[10px] p-2 -mr-2 text-slate-400 hover:text-slate-900">
               <X size={24} />
             </button>
           </div>
@@ -233,14 +233,14 @@ const HomePage = () => {
           <div className="p-6 bg-slate-50 space-y-4">
             <Link
               to="/login"
-              className="flex items-center justify-center w-full py-3 rounded-full text-xs font-semibold uppercase tracking-widest text-slate-900 border border-slate-200 hover:border-slate-900 transition-colors bg-white"
+              className="flex items-center justify-center w-full py-3 rounded-[10px] text-xs font-semibold uppercase tracking-widest text-slate-900 border border-slate-200 hover:border-slate-900 transition-colors bg-white"
               onClick={toggleMenu}
             >
               Aula Virtual
             </Link>
             <Link
               to="/admision"
-              className="flex items-center justify-center w-full py-3 rounded-full text-xs font-semibold uppercase tracking-widest text-white bg-orange-700 hover:bg-orange-800 shadow-lg shadow-orange-700/20 transition-all"
+              className="flex items-center justify-center w-full py-3 rounded-[10px] text-xs font-semibold uppercase tracking-widest text-white bg-orange-700 hover:bg-orange-800 shadow-lg shadow-orange-700/20 transition-all"
               onClick={toggleMenu}
             >
               Admisión 2026

@@ -262,7 +262,7 @@ export default function Login() {
                   value={form.username}
                   onChange={handleChange}
                   placeholder="DNI o Código de Familia"
-                  className="w-full h-10 bg-white border border-slate-300 rounded-lg text-sm pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-10 bg-white border border-slate-300 rounded-[4px] text-sm pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
@@ -278,13 +278,13 @@ export default function Login() {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="Contraseña"
-                  className="w-full h-10 bg-white border border-slate-300 rounded-lg text-sm pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full h-10 bg-white border border-slate-300 rounded-[4px] text-sm pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="rounded-[10px] absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -295,7 +295,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold h-11 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold h-11 rounded-[10px] transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

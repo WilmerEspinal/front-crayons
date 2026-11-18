@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bot, X, Send, Loader2, Sparkles, ChevronDown } from "lucide-react";
 import api from "@/lib/axios";
+import MensajeAsistente from "@/components/MensajeAsistente";
 
 interface Message {
     role: "user" | "assistant";
@@ -15,7 +16,7 @@ export function AiAssistant() {
     const [messages, setMessages] = useState<Message[]>([
         {
             role: "assistant",
-            text: "¡Hola! Soy el asistente inteligente de Crayon's. Puedes preguntarme sobre alumnos, docentes, pagos, asistencia y más. ¿En qué te puedo ayudar?",
+            text: "¡Hola! Soy el asistente de Crayon's. Puedes preguntarme por **tu horario**, **tus cursos**, **los alumnos que más faltan** o **las justificaciones** que tienes por revisar.",
         },
     ]);
     const [loading, setLoading] = useState(false);
@@ -41,7 +42,9 @@ export function AiAssistant() {
         setLoading(true);
 
         try {
-            const { data } = await api.post("/ai-assistant", { pregunta: question });
+            // Ultimos mensajes para que pueda entender preguntas de seguimiento
+            const historial = messages.slice(1).slice(-4).map((m) => ({ rol: m.role, texto: m.text }));
+            const { data } = await api.post("/ai-assistant", { pregunta: question, historial });
             setMessages((prev) => [
                 ...prev,
                 {
@@ -55,6 +58,7 @@ export function AiAssistant() {
                 {
                     role: "assistant",
                     text:
+                        err?.response?.data?.error ||
                         err?.response?.data?.message ||
                         "Ocurrió un error al consultar el asistente. Inténtalo de nuevo.",
                 },
@@ -78,7 +82,7 @@ export function AiAssistant() {
             {/* Floating Button */}
             <button
                 onClick={() => setOpen((o) => !o)}
-                className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 group ${open
+                className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-[10px] shadow-xl flex items-center justify-center transition-all duration-300 group ${open
                     ? "bg-slate-800 rotate-0"
                     : "bg-gradient-to-br from-blue-600 to-indigo-600 hover:scale-105 hover:shadow-2xl hover:shadow-blue-200"
                     }`}
@@ -109,11 +113,11 @@ export function AiAssistant() {
                     </div>
                     <div className="flex-1">
                         <p className="text-xs font-bold text-white">Asistente Inteligente</p>
-                        <p className="text-[10px] text-blue-100 font-medium">Crayon's AI · Powered by SQL</p>
+                        <p className="text-[10px] text-blue-100 font-medium">Crayon's AI · Datos en tiempo real</p>
                     </div>
                     <button
                         onClick={() => setOpen(false)}
-                        className="text-white/70 hover:text-white transition-colors"
+                        className="rounded-[10px] text-white/70 hover:text-white transition-colors"
                     >
                         <X className="w-4 h-4" />
                     </button>
@@ -132,12 +136,12 @@ export function AiAssistant() {
                                 </div>
                             )}
                             <div
-                                className={`max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${msg.role === "user"
+                                className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed ${msg.role === "user"
                                     ? "bg-blue-600 text-white rounded-br-none"
                                     : "bg-slate-100 text-slate-800 rounded-bl-none"
                                     }`}
                             >
-                                <p>{msg.text}</p>
+                                {msg.role === "assistant" ? <MensajeAsistente texto={msg.text} /> : <p>{msg.text}</p>}
 
                             </div>
                         </div>
@@ -172,13 +176,13 @@ export function AiAssistant() {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKey}
                             placeholder="Escribe tu pregunta..."
-                            className="flex-1 bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
+                            className="rounded-[4px] flex-1 bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
                             disabled={loading}
                         />
                         <button
                             onClick={handleSend}
                             disabled={!input.trim() || loading}
-                            className="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
+                            className="w-7 h-7 rounded-[10px] bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
                         >
                             {loading ? (
                                 <Loader2 className="w-3 h-3 animate-spin" />

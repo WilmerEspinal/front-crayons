@@ -169,10 +169,10 @@ const Valores = () => {
                             Haga que los valores <br /> sean parte del <span className="italic text-orange-600">futuro</span> de su hijo.
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
+                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
                                 Postular Ahora
                             </Link>
-                            <Link to="/contacto" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-900 hover:bg-slate-900 hover:text-white transition-all">
+                            <Link to="/contacto" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-900 hover:bg-slate-900 hover:text-white transition-all">
                                 Hablemos del Futuro
                             </Link>
                         </div>

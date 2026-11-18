@@ -277,7 +277,7 @@ export default function RegistrarAsistencia() {
               <select
                 value={anioSeleccionado}
                 onChange={(e) => setAnioSeleccionado(e.target.value)}
-                className={`w-full h-8 px-3 pr-8 bg-white border ${isPeriodoInactivo ? 'border-orange-200 text-orange-600' : 'border-slate-200'} rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer`}
+                className={`w-full h-8 px-3 pr-8 bg-white border ${isPeriodoInactivo ? 'border-orange-200 text-orange-600' : 'border-slate-200'} rounded-[4px] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer`}
               >
                 {periodos.map((p: any) => (
                   <option key={p.id} value={p.anio.toString()}>
@@ -301,7 +301,7 @@ export default function RegistrarAsistencia() {
                   setGradoSeleccionado(e.target.value);
                   setAsignacionSeleccionada("");
                 }}
-                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
+                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
               >
                 <option value="">Seleccionar Grado</option>
                 {gradosDisponibles.map(g => (
@@ -316,7 +316,7 @@ export default function RegistrarAsistencia() {
                 value={asignacionSeleccionada}
                 onChange={(e) => setAsignacionSeleccionada(e.target.value)}
                 disabled={!gradoSeleccionado}
-                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
               >
                 <option value="">Seleccionar Curso / Asignatura</option>
                 {asignacionesFiltradas.map(a => (
@@ -333,7 +333,7 @@ export default function RegistrarAsistencia() {
             {alumnos.length > 0 && !isPeriodoInactivo && (
               <button
                 onClick={() => setAlumnos(alumnos.map(al => ({ ...al, asistio: true })))}
-                className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-md transition-all active:scale-95"
+                className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-[10px] transition-all active:scale-95"
               >
                 Asistencia Masiva
               </button>
@@ -392,7 +392,7 @@ export default function RegistrarAsistencia() {
                             placeholder="Nota..."
                             value={alumno.observacion}
                             onChange={(e) => handleObservacionChange(alumno.id_alumno, e.target.value)}
-                            className="w-full bg-slate-50/50 text-[11px] font-medium border border-transparent rounded px-3 py-1.5 focus:bg-white focus:border-blue-100 outline-none transition-all placeholder:text-slate-300"
+                            className="w-full bg-slate-50/50 text-[11px] font-medium border border-transparent rounded-[4px] px-3 py-1.5 focus:bg-white focus:border-blue-100 outline-none transition-all placeholder:text-slate-300"
                           />
                         </td>
                         <td className="px-5 py-3 text-center">

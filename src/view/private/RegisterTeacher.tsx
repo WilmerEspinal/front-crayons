@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import axios from "axios";
+import axios from "@/lib/axios"; // instancia con el token del usuario
 import { Search, Loader2, AlertCircle, AlertTriangle, CheckCircle2, X } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -191,7 +191,11 @@ export default function RegisterTeacher() {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    // DNI 8 digitos y telefono 9 digitos, solo numeros
+    const value = name === "dni" ? e.target.value.replace(/\D/g, "").slice(0, 8)
+      : name === "telefono" ? e.target.value.replace(/\D/g, "").slice(0, 9)
+      : e.target.value;
     if (name === "dni") setSuccessMessage(null);
     setFormData((prev) => ({ ...prev, [name]: value }));
     const error = validateField(name, value);
@@ -382,7 +386,9 @@ export default function RegisterTeacher() {
                 </Label>
                 <Input
                   name="dni"
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={8}
                   value={formData.dni}
                   onChange={handleInputChange}
                   placeholder="Número de documento"
@@ -497,7 +503,9 @@ export default function RegisterTeacher() {
                 </Label>
                 <Input
                   name="telefono"
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={9}
                   value={formData.telefono}
                   onChange={handleInputChange}
                   placeholder="999888777"
@@ -663,7 +671,7 @@ export default function RegisterTeacher() {
           <div className="flex border-t border-slate-100 h-14">
             <button
               onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
-              className={`flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
+              className={`rounded-[10px] flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
                 }`}
             >
               {modalConfig.confirmText || "Aceptar"}

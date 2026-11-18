@@ -268,16 +268,16 @@ export default function ReporteAsistenciaClases() {
 
                 {/* Modo de filtro */}
                 <div className="flex items-center gap-2">
-                    <div className="inline-flex bg-white border border-slate-200 rounded-md overflow-hidden">
+                    <div className="inline-flex bg-white border border-slate-200 rounded-[10px] overflow-hidden">
                         <button
                             onClick={() => setModoFiltro("dia")}
-                            className={`px-4 py-1.5 text-xs font-semibold transition-colors ${modoFiltro === "dia" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+                            className={`rounded-[10px] px-4 py-1.5 text-xs font-semibold transition-colors ${modoFiltro === "dia" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
                         >
                             Por Día
                         </button>
                         <button
                             onClick={() => setModoFiltro("mes")}
-                            className={`px-4 py-1.5 text-xs font-semibold transition-colors ${modoFiltro === "mes" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+                            className={`rounded-[10px] px-4 py-1.5 text-xs font-semibold transition-colors ${modoFiltro === "mes" ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50"}`}
                         >
                             Por Mes
                         </button>
@@ -329,7 +329,7 @@ export default function ReporteAsistenciaClases() {
                                 <select
                                     value={gradoDesde}
                                     onChange={(e) => setGradoDesde(e.target.value)}
-                                    className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
+                                    className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
                                 >
                                     {GRADOS.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
                                 </select>
@@ -340,7 +340,7 @@ export default function ReporteAsistenciaClases() {
                                 <select
                                     value={gradoHasta}
                                     onChange={(e) => setGradoHasta(e.target.value)}
-                                    className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
+                                    className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
                                 >
                                     {GRADOS.filter(g => parseInt(g.value) >= parseInt(gradoDesde)).map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
                                 </select>
@@ -354,7 +354,7 @@ export default function ReporteAsistenciaClases() {
                                 type="date"
                                 value={fecha}
                                 onChange={(e) => setFecha(e.target.value)}
-                                className="h-8 w-40 text-xs rounded-md bg-white border-slate-200"
+                                className="h-8 w-40 text-xs rounded-[4px] bg-white border-slate-200"
                             />
                         ) : (
                             <div className="flex items-center gap-2">
@@ -362,7 +362,7 @@ export default function ReporteAsistenciaClases() {
                                     <select
                                         value={mesSeleccionado}
                                         onChange={(e) => setMesSeleccionado(e.target.value)}
-                                        className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-medium focus:outline-none appearance-none cursor-pointer"
+                                        className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-medium focus:outline-none appearance-none cursor-pointer"
                                     >
                                         {MESES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                                     </select>
@@ -372,7 +372,7 @@ export default function ReporteAsistenciaClases() {
                                     type="number"
                                     value={anioSeleccionado}
                                     onChange={(e) => setAnioSeleccionado(e.target.value)}
-                                    className="h-8 w-20 text-xs rounded-md bg-white border-slate-200"
+                                    className="h-8 w-20 text-xs rounded-[4px] bg-white border-slate-200"
                                     min="2020"
                                     max="2099"
                                 />
@@ -381,12 +381,12 @@ export default function ReporteAsistenciaClases() {
 
                         {/* Filtro de estado */}
                         {modoFiltro === "dia" && (
-                            <div className="inline-flex bg-white border border-slate-200 rounded-md overflow-hidden">
+                            <div className="inline-flex bg-white border border-slate-200 rounded-[10px] overflow-hidden">
                                 {(["Todos", "Presente", "Ausente"] as const).map(op => (
                                     <button
                                         key={op}
                                         onClick={() => setEstadoDia(op)}
-                                        className={`px-3 py-1.5 text-xs font-semibold transition-colors ${estadoDia === op
+                                        className={`rounded-[10px] px-3 py-1.5 text-xs font-semibold transition-colors ${estadoDia === op
                                             ? op === "Ausente" ? "bg-rose-500 text-white" : op === "Presente" ? "bg-emerald-500 text-white" : "bg-blue-600 text-white"
                                             : "text-slate-600 hover:bg-slate-50"
                                             }`}
@@ -397,12 +397,12 @@ export default function ReporteAsistenciaClases() {
                             </div>
                         )}
                         {modoFiltro === "mes" && (
-                            <div className="inline-flex bg-white border border-slate-200 rounded-md overflow-hidden">
+                            <div className="inline-flex bg-white border border-slate-200 rounded-[10px] overflow-hidden">
                                 {(["Todos", "ConFaltas", "SinFaltas"] as const).map(op => (
                                     <button
                                         key={op}
                                         onClick={() => setFiltroEstadoMes(op)}
-                                        className={`px-3 py-1.5 text-xs font-semibold transition-colors ${filtroEstadoMes === op
+                                        className={`rounded-[10px] px-3 py-1.5 text-xs font-semibold transition-colors ${filtroEstadoMes === op
                                             ? op === "ConFaltas" ? "bg-rose-500 text-white" : op === "SinFaltas" ? "bg-emerald-500 text-white" : "bg-blue-600 text-white"
                                             : "text-slate-600 hover:bg-slate-50"
                                             }`}
@@ -513,7 +513,7 @@ export default function ReporteAsistenciaClases() {
                                 <button
                                     onClick={() => { const p = pageDia - 1; setPageDia(p); fetchReporteDia(p); }}
                                     disabled={pageDia <= 1 || loading}
-                                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                    className="px-3 py-1.5 text-xs font-medium rounded-[10px] border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
                                 >Anterior</button>
                                 <span className="text-xs text-slate-600 font-medium">
                                     Página <span className="text-blue-600 font-bold">{pageDia}</span> de {totalPagesDia}
@@ -522,7 +522,7 @@ export default function ReporteAsistenciaClases() {
                                 <button
                                     onClick={() => { const p = pageDia + 1; setPageDia(p); fetchReporteDia(p); }}
                                     disabled={pageDia >= totalPagesDia || loading}
-                                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                    className="px-3 py-1.5 text-xs font-medium rounded-[10px] border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
                                 >Siguiente</button>
                             </div>
                         )}
@@ -615,7 +615,7 @@ export default function ReporteAsistenciaClases() {
                                 <button
                                     onClick={() => { const p = pageMes - 1; setPageMes(p); fetchReporteMes(p); }}
                                     disabled={pageMes <= 1 || loading}
-                                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                    className="px-3 py-1.5 text-xs font-medium rounded-[10px] border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
                                 >Anterior</button>
                                 <span className="text-xs text-slate-600 font-medium">
                                     Página <span className="text-blue-600 font-bold">{pageMes}</span> de {totalPagesMes}
@@ -624,7 +624,7 @@ export default function ReporteAsistenciaClases() {
                                 <button
                                     onClick={() => { const p = pageMes + 1; setPageMes(p); fetchReporteMes(p); }}
                                     disabled={pageMes >= totalPagesMes || loading}
-                                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
+                                    className="px-3 py-1.5 text-xs font-medium rounded-[10px] border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40"
                                 >Siguiente</button>
                             </div>
                         )}

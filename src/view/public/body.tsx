@@ -122,7 +122,7 @@ const Body = () => {
 
             {/* Call to Actions */}
             <div className={`flex flex-col sm:flex-row items-center gap-6 transition-all duration-1000 delay-700 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-              <Link to="/admision" className="w-full sm:w-auto group relative px-8 py-5 bg-orange-500 text-black font-bold text-sm tracking-widest uppercase rounded-full overflow-hidden transition-all hover:pr-12 text-center md:text-left">
+              <Link to="/admision" className="w-full sm:w-auto group relative px-8 py-5 bg-orange-500 text-black font-bold text-sm tracking-widest uppercase rounded-[10px] overflow-hidden transition-all hover:pr-12 text-center md:text-left">
                 <span className="relative z-10">Postula Ahora</span>
                 <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all w-5 h-5" />
               </Link>
@@ -460,7 +460,7 @@ const Body = () => {
               Espacios diseñados para <span className="italic text-orange-600">inspirar</span>
             </h2>
           </div>
-          <button className="group relative px-8 py-4 bg-[#1A237E] text-white rounded-full font-bold overflow-hidden transition-all hover:pr-12 shadow-lg text-center">
+          <button className="group relative px-8 py-4 bg-[#1A237E] text-white rounded-[10px] font-bold overflow-hidden transition-all hover:pr-12 shadow-lg text-center">
             <span className="relative z-10 flex items-center gap-3 tracking-wider text-sm justify-center">
               VER TOUR VIRTUAL <Play size={18} fill="currentColor" />
             </span>
@@ -629,7 +629,7 @@ const Body = () => {
                   { Icon: Instagram, color: 'hover:bg-pink-600', name: 'Instagram' },
                   { Icon: Youtube, color: 'hover:bg-red-600', name: 'Youtube' }
                 ].map(({ Icon, color, name }, i) => (
-                  <a key={i} href="#" aria-label={name} className={`w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all duration-300 ${color}`}>
+                  <a key={i} href="#" aria-label={name} className={`w-12 h-12 rounded-[10px] bg-white/5 border border-white/10 flex items-center justify-center text-white transition-all duration-300 ${color}`}>
                     <Icon size={20} />
                   </a>
                 ))}
@@ -689,7 +689,7 @@ const Body = () => {
                 <p className="text-xs text-slate-500 leading-relaxed">
                   Contáctanos directamente para agendar una visita guiada a nuestras instalaciones.
                 </p>
-                <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                <button className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-[10px] text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
                   <MessageSquare size={14} /> WhatsApp
                 </button>
               </div>
@@ -704,10 +704,9 @@ const Body = () => {
               <span className="text-orange-900">Satipo, Perú</span>
             </div>
 
-            <div className="flex gap-8 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-              <a href="#" className="hover:text-orange-500 transition-colors">Privacidad</a>
-              <a href="#" className="hover:text-orange-500 transition-colors">Términos</a>
-              <a href="#" className="hover:text-orange-500 transition-colors">Libro de Reclamaciones</a>
+            <div className="flex flex-wrap justify-center gap-6 md:gap-8 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              <Link to="/privacidad" className="hover:text-orange-500 transition-colors">Privacidad</Link>
+              <Link to="/terminos" className="hover:text-orange-500 transition-colors">Términos y Condiciones</Link>
             </div>
 
             <div className="flex items-center gap-2 opacity-30">

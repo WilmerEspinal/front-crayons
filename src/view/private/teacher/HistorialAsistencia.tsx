@@ -190,7 +190,7 @@ export default function HistorialAsistencia() {
               type="date"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="h-8 w-40 text-xs rounded-md bg-white border-slate-200"
+              className="h-8 w-40 text-xs rounded-[4px] bg-white border-slate-200"
             />
 
             <div className="relative w-48">
@@ -200,7 +200,7 @@ export default function HistorialAsistencia() {
                   setGrado(e.target.value);
                   setCurso("");
                 }}
-                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
+                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
               >
                 <option value="">Todos los grados</option>
                 {gradosDisponibles.map(g => (
@@ -214,7 +214,7 @@ export default function HistorialAsistencia() {
               <select
                 value={curso}
                 onChange={(e) => setCurso(e.target.value)}
-                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-md text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
+                className="w-full h-8 px-3 pr-8 bg-white border border-slate-200 rounded-[4px] text-xs font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none cursor-pointer"
               >
                 <option value="">Todas las materias</option>
                 {asignacionesFiltradas.map(a => (

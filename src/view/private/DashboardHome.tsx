@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   fetchSummaryStats, fetchPeriodsList,
@@ -7,31 +6,47 @@ import {
   type DashboardSummaryData, type AcademicPeriod
 } from "@/services/dashboardService";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
-} from 'recharts';
-import {
-  TrendingUp, TrendingDown, CreditCard,
-  AlertCircle, Loader2, DollarSign, Target,
-  AlertTriangle, GraduationCap, Clock, CheckCircle2,
-  Briefcase, RefreshCw
-} from "lucide-react";
+import GraficoECharts from "@/components/GraficoECharts";
+import { AlertCircle, Loader2, AlertTriangle, RefreshCw } from "lucide-react";
 
 const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-const CURRENT_MONTH = new Date().toLocaleDateString('es-PE', { month: 'long' });
 
+// Paleta tomada de lessa-front
 const COLORS = {
-  active: '#3b82f6',
-  inactive: '#94a3b8',
-  teacherActive: '#8b5cf6',
+  primary: '#16498C',
+  secondary: '#F2AE2E',
+  active: '#16498C',
+  inactive: '#cbd5e1',
+  teacherActive: '#F2AE2E',
   teacherInactive: '#cbd5e1',
   present: '#10b981',
-  absent: '#f43f5e',
+  absent: '#ef4444',
   pending: '#e2e8f0',
   paid: '#10b981',
-  debt: '#f43f5e'
+  debt: '#ef4444',
+  danger: '#ef4444',
+  grid: '#e2e8f0',
+  // Pareja validada para daltonismo, de la familia del azul y el ambar de lessa
+  mujeres: '#c98210',
+  varones: '#1f5fae'
 };
+
+// Estilo comun de ejes y tooltips de ECharts, con los tonos de lessa
+const EJE = {
+  axisLine: { show: false },
+  axisTick: { show: false },
+  axisLabel: { fontSize: 11, color: '#475569' },
+  splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } },
+};
+const TOOLTIP = {
+  backgroundColor: '#ffffff',
+  borderColor: '#e2e8f0',
+  borderWidth: 1,
+  padding: [6, 10],
+  textStyle: { fontSize: 12, color: '#1e293b' },
+  extraCssText: 'box-shadow:0 1px 3px rgba(0,0,0,0.1);border-radius:6px;',
+};
+const ETIQUETA_BARRA = { show: true, position: 'top', fontSize: 11, fontWeight: 600, color: '#334155' };
 
 export default function DashboardHome() {
   const [summaryData, setSummaryData] = useState<DashboardSummaryData | null>(null);
@@ -85,7 +100,7 @@ export default function DashboardHome() {
   if (isLoading) {
     return (
       <div className="flex h-[80vh] flex-col items-center justify-center text-slate-600">
-        <Loader2 className="h-8 w-8 animate-spin mb-4 text-blue-600" />
+        <Loader2 className="h-8 w-8 animate-spin mb-4 text-[#16498C]" />
         <p className="text-sm font-medium">Cargando panel...</p>
       </div>
     );
@@ -107,10 +122,13 @@ export default function DashboardHome() {
     { name: "Pendiente", value: comparativa_pagos.pendiente, color: COLORS.debt }
   ];
 
-  const studentPopulationData = [
-    { name: "Activos", value: kpis.estudiantes_activos, color: COLORS.active },
-    { name: "Retirados", value: kpis.estudiantes_inactivos, color: COLORS.inactive }
-  ];
+  const alumnosPorGrado = (summaryData.alumnos_por_grado || []).map((g) => ({
+    grado: g.grado.charAt(0) + g.grado.slice(1).toLowerCase(),
+    Mujeres: g.mujeres,
+    Varones: g.varones,
+  }));
+  const totalActivos = kpis.estudiantes_activos;
+  const totalDocentes = kpis.docentes_activos;
 
   const teacherPopulationData = [
     { name: "Activos", value: kpis.docentes_activos, color: COLORS.teacherActive },
@@ -128,29 +146,26 @@ export default function DashboardHome() {
     Recaudación: parseFloat(item.total)
   }));
 
-  const ingresosActuales = parseFloat(kpis.ingresos_mensuales);
-  const ingresosAnteriores = parseFloat(kpis.ingresos_mes_anterior);
-  const crecimiento = ingresosAnteriores > 0 ? ((ingresosActuales - ingresosAnteriores) / ingresosAnteriores) * 100 : 0;
 
   return (
-    <div className="flex-1 bg-slate-50 p-4 md:p-5 space-y-5">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div className="flex-1 bg-[#f8fafc] p-4 space-y-3 font-[Inter,ui-sans-serif,system-ui,sans-serif] antialiased">
+      {/* Encabezado */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Panel Principal Directivo</h1>
-          <p className="text-xs text-slate-500 mt-0.5">Control global consolidado.</p>
+          <h1 className="text-[20px] font-bold text-[#1e293b] leading-tight">Panel Principal Directivo</h1>
+          <p className="text-[13px] text-[#475569]">Control global consolidado.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {!periodoActivo && (
-            <span className="flex items-center gap-1.5 text-xs font-bold text-rose-700 bg-rose-100 px-2 py-1 rounded shadow-sm border border-rose-200">
-              <AlertTriangle className="h-4 w-4" /> PERÍODO INACTIVO
+            <span className="flex items-center gap-1 text-[12px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded border border-red-200">
+              <AlertTriangle className="h-3.5 w-3.5" /> PERÍODO INACTIVO
             </span>
           )}
-          <Button variant="outline" size="icon" className="h-8 w-8 bg-white border-slate-300 shadow-sm" onClick={() => fetchDashboardData(selectedYear, true)} title="Recargar datos (Ignorar caché)">
-            <RefreshCw className="h-3.5 w-3.5 text-slate-600" />
+          <Button variant="outline" size="icon" className="h-8 w-8 bg-white border-[#e2e8f0] shadow-none" onClick={() => fetchDashboardData(selectedYear, true)} title="Recargar datos (Ignorar caché)">
+            <RefreshCw className="h-3.5 w-3.5 text-[#475569]" />
           </Button>
           <Select value={selectedYear} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-[110px] h-8 bg-white border-slate-300 text-xs shadow-sm">
+            <SelectTrigger className="w-[120px] h-8 bg-white border-[#e2e8f0] text-xs shadow-none">
               <SelectValue placeholder="Año" />
             </SelectTrigger>
             <SelectContent>
@@ -164,286 +179,230 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* --- BLOQUE 1: FINANZAS Y RECAUDACIÓN --- */}
-      <div className="space-y-2">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Finanzas</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <MetricCard
-            title="Recaudación Mes"
-            value={formatCurrency(kpis.ingresos_mensuales)}
-            icon={<DollarSign className="h-4 w-4 text-emerald-600" />}
-            trend={`${crecimiento >= 0 ? '+' : ''}${crecimiento.toFixed(1)}% vs anterior`}
-            trendPositive={crecimiento >= 0}
-          />
-          <MetricCard
-            title="Meta del Mes"
-            value={formatCurrency(kpis.monto_esperado_mes)}
-            icon={<Target className="h-4 w-4 text-slate-500" />}
-            desc={`Esperado para ${CURRENT_MONTH}`}
-          />
-          <MetricCard
-            title="Deuda Estudiantil"
-            value={formatCurrency(kpis.pagos_pendientes)}
-            icon={<AlertCircle className="h-4 w-4 text-rose-600" />}
-            desc={`${kpis.estudiantes_con_deuda} alumnos en mora`}
-            highlight="danger"
-          />
-          <MetricCard
-            title="Proyección Anual"
-            value={formatCurrency(kpis.monto_esperado_anio)}
-            icon={<CreditCard className="h-4 w-4 text-blue-600" />}
-            desc={`Meta de ${selectedYear}`}
-          />
+      {/* --- RESUMEN GENERAL --- */}
+      <section className="space-y-1.5">
+        <TituloSeccion texto="Resumen General" />
+        <div className="flex flex-wrap gap-1.5">
+          <ResumenCard title="Alumnos Activos" value={totalActivos} />
+          <ResumenCard title="Mujeres" value={kpis.alumnas_activas} />
+          <ResumenCard title="Varones" value={kpis.alumnos_varones_activos} />
+          <ResumenCard title="Docentes Activos" value={totalDocentes} />
+          <ResumenCard title="Padres con Acceso" value={kpis.apoderados_con_acceso} />
+          <ResumenCard title="Justificaciones Pendientes" value={kpis.justificaciones_pendientes} />
+          <ResumenCard title="Recaudación Mes" value={formatCurrency(kpis.ingresos_mensuales)} />
+          <ResumenCard title="Deuda Estudiantil" value={formatCurrency(kpis.pagos_pendientes)} />
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        {/* Gráfico Financiero Principal */}
-        <Card className="lg:col-span-2 shadow-sm border border-slate-200">
-          <CardHeader className="p-3 border-b border-slate-100 pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-800">Recaudación (6 meses)</CardTitle>
-          </CardHeader>
-          <CardContent className="p-3 pt-4">
-            <div className="h-[220px] w-full">
-              {monthlyTrendData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthlyTrendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B' }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B' }} tickFormatter={(val) => `S/ ${val}`} />
-                    <RechartsTooltip
-                      formatter={(value: any) => [formatCurrency(value), "Recaudación"]}
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Line type="monotone" dataKey="Recaudación" stroke="#2563EB" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-slate-400 font-medium">Sin datos suficientes</div>
-              )}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-2">
+          <Panel titulo={`Alumnos activos por grado (${selectedYear})`} extra={
+            <div className="flex items-center gap-3 text-[12px] text-[#475569]">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full" style={{ background: COLORS.mujeres }} />Mujeres</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full" style={{ background: COLORS.varones }} />Varones</span>
             </div>
-          </CardContent>
-        </Card>
+          }>
+            {alumnosPorGrado.length > 0 ? (
+              <GraficoECharts alto={200} opciones={{
+                tooltip: { ...TOOLTIP, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(241,245,249,0.8)' } } },
+                grid: { left: 30, right: 8, top: 24, bottom: 24 },
+                xAxis: { type: 'category', data: alumnosPorGrado.map((g) => g.grado), ...EJE, splitLine: { show: false } },
+                yAxis: { type: 'value', minInterval: 1, ...EJE },
+                series: [
+                  { name: 'Mujeres', type: 'bar', data: alumnosPorGrado.map((g) => g.Mujeres), barMaxWidth: 42, barGap: '10%', barCategoryGap: '28%', itemStyle: { color: COLORS.mujeres, borderRadius: [2, 2, 0, 0] }, label: ETIQUETA_BARRA },
+                  { name: 'Varones', type: 'bar', data: alumnosPorGrado.map((g) => g.Varones), barMaxWidth: 42, itemStyle: { color: COLORS.varones, borderRadius: [2, 2, 0, 0] }, label: ETIQUETA_BARRA },
+                ],
+              }} />
+            ) : <SinDatos texto="Sin alumnos activos en este año" />}
+          </Panel>
 
-        {/* Distribución Financiera */}
-        <Card className="shadow-sm border border-slate-200">
-          <CardHeader className="p-3 border-b border-slate-100 pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-800">Progreso Anual</CardTitle>
-          </CardHeader>
-          <CardContent className="p-2 pb-4">
-            <div className="h-[180px] w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={paymentStatusData}
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                  >
-                    {paymentStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip formatter={(value: any) => formatCurrency(value)} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="px-4 space-y-1.5 mt-2">
-              {paymentStatusData.map((d, i) => (
-                <div key={i} className="flex justify-between items-center text-xs">
-                  <div className="flex gap-1.5 items-center">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-                    <span className="text-slate-600 font-medium">{d.name}</span>
-                  </div>
-                  <span className="font-bold text-slate-900">{formatCurrency(d.value)}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* --- BLOQUE 2: POBLACIÓN EDUCATIVA --- */}
-      <div className="space-y-2 pt-1">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-1">Personal y Población</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-
-          {/* Alumnos */}
-          <Card className="shadow-sm border border-slate-200">
-            <CardHeader className="p-3 border-b border-slate-100 flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-slate-800">Alumnos</CardTitle>
-              <GraduationCap className="w-4 h-4 text-slate-400" />
-            </CardHeader>
-            <CardContent className="p-0 flex items-center h-[160px]">
-              <div className="w-[50%] h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={studentPopulationData} innerRadius={35} outerRadius={55} paddingAngle={2} dataKey="value">
-                      {studentPopulationData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="w-[50%] pr-4 space-y-3">
-                <div>
-                  <div className="text-xl font-bold leading-none text-slate-900">{kpis.estudiantes_activos}</div>
-                  <div className="text-[10px] text-blue-600 font-semibold uppercase mt-0.5">Activos</div>
-                </div>
-                <div>
-                  <div className="text-sm font-bold leading-none text-slate-600">{kpis.estudiantes_inactivos}</div>
-                  <div className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">Retirados</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Docentes */}
-          <Card className="shadow-sm border border-slate-200">
-            <CardHeader className="p-3 border-b border-slate-100 flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-semibold text-slate-800">Docentes</CardTitle>
-              <Briefcase className="w-4 h-4 text-slate-400" />
-            </CardHeader>
-            <CardContent className="p-0 flex items-center h-[160px]">
-              <div className="w-[50%] h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={teacherPopulationData} innerRadius={35} outerRadius={55} paddingAngle={2} dataKey="value">
-                      {teacherPopulationData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="w-[50%] pr-4 space-y-3">
-                <div>
-                  <div className="text-xl font-bold leading-none text-slate-900">{kpis.docentes_activos}</div>
-                  <div className="text-[10px] text-purple-600 font-semibold uppercase mt-0.5">Activos</div>
-                </div>
-                <div>
-                  <div className="text-sm font-bold leading-none text-slate-600">{kpis.docentes_inactivos}</div>
-                  <div className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">Inactivos</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Asistencia Global Hoy */}
-          <Card className="shadow-sm border border-slate-200 flex flex-col">
-            <CardHeader className="p-3 border-b border-slate-100 flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle className="text-sm font-semibold text-slate-800">Asistencia Hoy</CardTitle>
-                <p className="text-[10px] text-slate-500 mt-0.5 font-medium">Alumnos con ausencias: <span className="font-bold text-rose-600">{kpis.asistencia_hoy_ausentes}</span></p>
-              </div>
-              <Clock className="w-4 h-4 text-emerald-500" />
-            </CardHeader>
-            <CardContent className="p-2 pb-0 flex-1 flex flex-col">
-              <div className="w-full flex-1 min-h-[120px] mt-1 -ml-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={dailyAttendanceData} margin={{ top: 15, right: 5, left: -25, bottom: -5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748B', fontWeight: 600 }} dy={5} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748B' }} />
-                    <RechartsTooltip cursor={{ fill: '#f1f5f9' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }} />
-                    <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={45}>
-                      {dailyAttendanceData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <Panel titulo="Mujeres y varones">
+            <DonaConLeyenda datos={[
+              { name: "Mujeres", value: kpis.alumnas_activas, color: COLORS.mujeres },
+              { name: "Varones", value: kpis.alumnos_varones_activos, color: COLORS.varones },
+            ]} mostrarPorcentaje vertical />
+          </Panel>
         </div>
-      </div>
+      </section>
 
-      {/* --- BLOQUE 3: LISTADOS RÁPIDOS --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
-        {/* Últimos Pagos */}
-        <Card className="shadow-sm border border-slate-200">
-          <CardHeader className="p-3 border-b border-slate-100 pb-2 flex-row justify-between items-center">
-            <CardTitle className="text-sm font-semibold text-slate-800">Últimos Pagos</CardTitle>
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          </CardHeader>
-          <CardContent className="p-2">
-            <div className="space-y-0.5">
-              {recentPayments.length > 0 ? recentPayments.slice(0, 4).map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded transition-colors">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-900 truncate uppercase">{p.studentName}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">{p.type}</p>
-                  </div>
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded ml-2 border border-emerald-100">
-                    +{formatCurrency(p.amount)}
-                  </span>
-                </div>
-              )) : (
-                <p className="text-xs text-center text-slate-400 py-4">No hay pagos recientes</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      {/* --- FINANZAS --- */}
+      <section className="space-y-1.5">
+        <TituloSeccion texto="Finanzas" />
 
-        {/* Deudores */}
-        <Card className="shadow-sm border border-slate-200">
-          <CardHeader className="p-3 border-b border-slate-100 pb-2 flex-row justify-between items-center">
-            <CardTitle className="text-sm font-semibold text-slate-800">Principales Morosos</CardTitle>
-            <AlertCircle className="w-4 h-4 text-rose-500" />
-          </CardHeader>
-          <CardContent className="p-2">
-            <div className="space-y-0.5">
-              {debtors.length > 0 ? debtors.slice(0, 4).map((d) => (
-                <div key={d.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded transition-colors">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-slate-900 truncate uppercase">{d.studentName}</p>
-                    <p className="text-[10px] text-rose-600 font-semibold">{d.months} {d.months === 1 ? 'mes' : 'meses'} atraso</p>
-                  </div>
-                  <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded ml-2 border border-rose-100">
-                    {formatCurrency(d.amount)}
-                  </span>
-                </div>
-              )) : (
-                <p className="text-xs text-center text-slate-400 py-4">Sin registro de morosos</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-2">
+          <Panel titulo={`Recaudación ${selectedYear} · desde marzo`}>
+            {monthlyTrendData.length > 0 ? (
+              <GraficoECharts alto={200} opciones={{
+                tooltip: { ...TOOLTIP, trigger: 'axis', valueFormatter: (v: number) => formatCurrency(v) },
+                grid: { left: 52, right: 12, top: 14, bottom: 24 },
+                xAxis: { type: 'category', boundaryGap: false, data: monthlyTrendData.map((m) => m.name), ...EJE, splitLine: { show: false } },
+                yAxis: { type: 'value', ...EJE, axisLabel: { ...EJE.axisLabel, formatter: (v: number) => (v >= 1000 ? `S/ ${v / 1000}k` : `S/ ${v}`) } },
+                series: [{
+                  name: 'Recaudación', type: 'line', smooth: true, showSymbol: false, symbolSize: 8,
+                  data: monthlyTrendData.map((m) => m.Recaudación),
+                  lineStyle: { width: 3, color: COLORS.primary }, itemStyle: { color: COLORS.primary },
+                }],
+              }} />
+            ) : <SinDatos texto="Sin datos suficientes" />}
+          </Panel>
+
+          <Panel titulo="Progreso Anual">
+            <DonaConLeyenda datos={paymentStatusData} formatear={formatCurrency} mostrarPorcentaje vertical />
+          </Panel>
+        </div>
+      </section>
+
+      {/* --- PERSONAL Y POBLACIÓN --- */}
+      <section className="space-y-1.5">
+        <TituloSeccion texto="Personal y Población" />
+        <div className="grid grid-cols-1 md:grid-cols-[auto_auto_minmax(0,1fr)] gap-2">
+          <Panel titulo="Alumnos">
+            <PastelConLeyenda datos={[
+              { name: "Activos", value: kpis.estudiantes_activos, color: COLORS.active },
+              { name: "Retirados", value: kpis.alumnos_retirados, color: COLORS.inactive },
+              { name: "Expulsados", value: kpis.alumnos_expulsados, color: COLORS.danger },
+              { name: "Egresados", value: kpis.alumnos_egresados, color: COLORS.secondary },
+            ]} />
+          </Panel>
+
+          <Panel titulo="Docentes">
+            <PastelConLeyenda datos={teacherPopulationData} />
+          </Panel>
+
+          <Panel titulo="Asistencia Hoy" extra={<span className="text-[12px] text-[#475569]">Ausentes: <b className="text-red-500">{kpis.asistencia_hoy_ausentes}</b></span>}>
+            <GraficoECharts alto={230} opciones={{
+              tooltip: { ...TOOLTIP, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(241,245,249,0.8)' } } },
+              grid: { left: 34, right: 8, top: 16, bottom: 24 },
+              xAxis: { type: 'category', data: dailyAttendanceData.map((d) => d.name), ...EJE, axisLabel: { ...EJE.axisLabel, interval: 0 }, splitLine: { show: false } },
+              yAxis: { type: 'value', minInterval: 1, ...EJE },
+              series: [{
+                name: 'Alumnos', type: 'bar', barMaxWidth: 64,
+                data: dailyAttendanceData.map((d) => ({ value: d.value, itemStyle: { color: d.fill, borderRadius: [2, 2, 0, 0] } })),
+              }],
+            }} />
+          </Panel>
+        </div>
+      </section>
+
+      {/* --- LISTADOS RÁPIDOS --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+        <Panel titulo="Últimos Pagos">
+          {recentPayments.length > 0 ? recentPayments.slice(0, 4).map((p) => (
+            <FilaLista key={p.id} nombre={p.studentName} detalle={p.type} monto={`+${formatCurrency(p.amount)}`} tono="ok" />
+          )) : <SinDatos texto="No hay pagos recientes" />}
+        </Panel>
+
+        <Panel titulo="Principales Morosos">
+          {debtors.length > 0 ? debtors.slice(0, 4).map((d) => (
+            <FilaLista key={d.id} nombre={d.studentName} detalle={`${d.months} ${d.months === 1 ? 'mes' : 'meses'} de atraso`} monto={formatCurrency(d.amount)} tono="deuda" />
+          )) : <SinDatos texto="Sin registro de morosos" />}
+        </Panel>
       </div>
     </div>
   );
 }
 
-function MetricCard({ title, value, icon, desc, trend, trendPositive, highlight }: any) {
+/** Titulo pequenio de cada bloque del panel */
+function TituloSeccion({ texto }: { texto: string }) {
+  return <h2 className="text-[12px] font-bold tracking-widest uppercase text-[#475569] pl-0.5">{texto}</h2>;
+}
+
+/** Contenedor blanco con borde suave, igual al de los graficos de lessa */
+function Panel({ titulo, extra, className = "", children }: { titulo: string; extra?: React.ReactNode; className?: string; children: React.ReactNode }) {
   return (
-    <Card className={`shadow-sm border transition-colors ${highlight === 'danger' ? 'border-rose-200 bg-rose-50/10' : 'border-slate-200 hover:border-slate-300'}`}>
-      <CardContent className="p-3">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="text-[11px] font-semibold text-slate-500 uppercase tracking-tight">{title}</h3>
-          <div className={`${highlight === 'danger' ? 'bg-rose-100 p-1 rounded-md' : 'bg-slate-100 p-1 rounded-md'}`}>
-            {icon}
-          </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className={`text-[19px] font-bold tracking-tight leading-none ${highlight === 'danger' ? 'text-rose-700' : 'text-slate-900'}`}>
-            {value}
-          </span>
-          {trend && (
-            <p className={`text-[10px] flex items-center font-bold ${trendPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {trendPositive ? <TrendingUp className="h-3 w-3 mr-0.5" /> : <TrendingDown className="h-3 w-3 mr-0.5" />}
-              {trend}
-            </p>
-          )}
-          {desc && !trend && (
-            <p className="text-[10px] text-slate-500 font-medium leading-tight">{desc}</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <div className={`bg-white border border-[#e2e8f0] rounded-lg p-2.5 flex flex-col min-w-0 ${className}`}>
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[11px] font-bold tracking-widest uppercase text-[#475569]">{titulo}</p>
+        {extra}
+      </div>
+      <div className="flex-1 flex flex-col justify-center">{children}</div>
+    </div>
+  );
+}
+
+/** Mensaje cuando un bloque no tiene datos */
+function SinDatos({ texto }: { texto: string }) {
+  return <p className="text-[13px] text-[#475569] py-6 text-center">{texto}</p>;
+}
+
+/** Dona con su leyenda pegada al costado, centradas juntas dentro del panel */
+function DonaConLeyenda({ datos, formatear, mostrarPorcentaje = false, vertical = false }: {
+  datos: { name: string; value: number; color: string }[];
+  formatear?: (v: number) => string;
+  mostrarPorcentaje?: boolean;
+  /** Leyenda debajo de la dona, para paneles angostos */
+  vertical?: boolean;
+}) {
+  const total = datos.reduce((suma, d) => suma + Number(d.value || 0), 0);
+  return (
+    <div className={`flex items-center justify-center ${vertical ? "flex-col gap-2 px-2" : "gap-4"}`}>
+      <div className="shrink-0">
+        <GraficoECharts alto={vertical ? 160 : 170} ancho={vertical ? 160 : 170} opciones={{
+          tooltip: { ...TOOLTIP, trigger: 'item', formatter: (p: { name: string; value: number; percent: number }) => `${p.name}: <b>${formatear ? formatear(p.value) : p.value}</b> (${p.percent}%)` },
+          series: [{
+            type: 'pie', radius: ['56%', '92%'], avoidLabelOverlap: true, label: { show: false }, labelLine: { show: false },
+            itemStyle: { borderColor: '#ffffff', borderWidth: 2 },
+            data: datos.map((d) => ({ name: d.name, value: d.value, itemStyle: { color: d.color } })),
+          }],
+        }} />
+      </div>
+      <div className="grid grid-cols-[10px_auto_auto] items-center gap-x-2 gap-y-2 text-[12px]">
+        {datos.map((d) => (
+          <React.Fragment key={d.name}>
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
+            <span className="text-[#475569] whitespace-nowrap">{d.name}</span>
+            <span className="font-bold text-[#1e293b] tabular-nums text-right whitespace-nowrap">
+              {formatear ? formatear(d.value) : d.value}
+              {mostrarPorcentaje && total > 0 && (
+                <span className="font-normal text-[#64748b] ml-1">({Math.round((Number(d.value) / total) * 100)}%)</span>
+              )}
+            </span>
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Pastel completo con leyenda arriba, sin etiquetas afuera (estilo "Referer of a Website" de ECharts) */
+function PastelConLeyenda({ datos }: { datos: { name: string; value: number; color: string }[] }) {
+  return (
+    <GraficoECharts alto={220} ancho={260} opciones={{
+      tooltip: { ...TOOLTIP, trigger: 'item', formatter: '{b}: <b>{c}</b> ({d}%)' },
+      legend: { top: 0, left: 'center', itemWidth: 14, itemHeight: 9, itemGap: 12, textStyle: { fontSize: 12, color: '#475569' } },
+      series: [{
+        type: 'pie', radius: '68%', center: ['50%', '58%'],
+        label: { show: false }, labelLine: { show: false },
+        itemStyle: { borderColor: '#ffffff', borderWidth: 1.5 },
+        emphasis: { itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.3)' } },
+        data: datos.map((d) => ({ name: d.name, value: d.value, itemStyle: { color: d.color } })),
+      }],
+    }} />
+  );
+}
+
+/** Fila de los listados de pagos y morosos */
+function FilaLista({ nombre, detalle, monto, tono }: { nombre: string; detalle: string; monto: string; tono: "ok" | "deuda" }) {
+  return (
+    <div className="flex items-center justify-between py-1.5 border-b border-[#e2e8f0] last:border-0">
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-semibold text-[#1e293b] truncate uppercase">{nombre}</p>
+        <p className={`text-[11px] ${tono === "deuda" ? "text-red-500 font-semibold" : "text-[#475569]"}`}>{detalle}</p>
+      </div>
+      <span className={`text-[13px] font-bold tabular-nums ml-2 ${tono === "deuda" ? "text-red-500" : "text-emerald-600"}`}>{monto}</span>
+    </div>
+  );
+}
+
+interface ResumenCardProps {
+  title: string;
+  value: number | string;
+}
+
+/** Tarjeta corta del resumen general: numero y etiqueta, estilo lessa */
+function ResumenCard({ title, value }: ResumenCardProps) {
+  return (
+    <div className="bg-white border border-[#e2e8f0] rounded-lg px-3.5 py-3 min-w-[96px]">
+      <p className="text-[20px] font-bold text-[#1e293b] leading-tight tabular-nums">{value}</p>
+      <p className="text-[11px] text-[#475569] leading-tight whitespace-nowrap">{title}</p>
+    </div>
   );
 }

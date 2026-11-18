@@ -292,7 +292,7 @@ export default function ScheduleGrid() {
             <div>
               <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Período</label>
               <select
-                className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-sm text-gray-800"
+                className="w-full border border-gray-300 rounded-[4px] p-2 bg-gray-50 text-sm text-gray-800"
                 value={idPeriodo}
                 onChange={(e) => setIdPeriodo(e.target.value)}
               >
@@ -306,7 +306,7 @@ export default function ScheduleGrid() {
             <div>
               <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Docente</label>
               <select
-                className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-sm text-gray-800"
+                className="w-full border border-gray-300 rounded-[4px] p-2 bg-gray-50 text-sm text-gray-800"
                 value={idDocente}
                 onChange={(e) => setIdDocente(e.target.value)}
               >
@@ -320,7 +320,7 @@ export default function ScheduleGrid() {
             <div>
               <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Grado</label>
               <select
-                className="w-full border border-gray-300 rounded-md p-2 bg-gray-50 text-sm text-gray-800"
+                className="w-full border border-gray-300 rounded-[4px] p-2 bg-gray-50 text-sm text-gray-800"
                 value={idGrado}
                 onChange={(e) => setIdGrado(e.target.value)}
               >
@@ -339,7 +339,7 @@ export default function ScheduleGrid() {
               className={`${!idDocente
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-                } transition-colors text-white font-semibold flex items-center justify-center gap-2 py-2 px-4 rounded-md h-[38px] w-full`}
+                } transition-colors text-white font-semibold flex items-center justify-center gap-2 py-2 px-4 rounded-[10px] h-[38px] w-full`}
             >
               <Filter className="w-4 h-4" />
               Filtrar

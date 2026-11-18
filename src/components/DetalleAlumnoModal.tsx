@@ -70,7 +70,7 @@ export function DetalleAlumnoModal({ alumno, estiloEstado, onClose }: DetalleAlu
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[5px] bg-slate-100 text-slate-500 transition-colors hover:text-slate-900"
+            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[10px] bg-slate-100 text-slate-500 transition-colors hover:text-slate-900"
           >
             <X size={16} />
           </button>

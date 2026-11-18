@@ -95,7 +95,7 @@ const Tecnologia = () => {
                                     </p>
 
                                     <div className="pt-6">
-                                        <button className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#080B16] hover:text-cyan-600 transition-colors group">
+                                        <button className="rounded-[10px] flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-[#080B16] hover:text-cyan-600 transition-colors group">
                                             Explorar Programa <ChevronRight size={18} className="translate-x-0 group-hover:translate-x-2 transition-transform" />
                                         </button>
                                     </div>
@@ -131,10 +131,10 @@ const Tecnologia = () => {
                             ¿Preparado para <br /> el siguiente nivel?
                         </h3>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Link to="/admision" className="bg-white text-[#080B16] px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all">
+                            <Link to="/admision" className="bg-white text-[#080B16] px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all">
                                 Solicitar Información
                             </Link>
-                            <Link to="/contacto" className="bg-white/5 border border-white/10 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+                            <Link to="/contacto" className="bg-white/5 border border-white/10 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
                                 Agendar Demo Tech
                             </Link>
                         </div>

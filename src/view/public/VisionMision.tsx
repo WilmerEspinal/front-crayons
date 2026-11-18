@@ -141,7 +141,7 @@ const VisionMision = () => {
                     <span className="text-6xl font-serif text-slate-100 group-hover:text-orange-500/20 transition-colors uppercase leading-none">{milestone.year}</span>
                     <h3 className="text-2xl font-bold text-slate-900">{milestone.title}</h3>
                     <p className="text-slate-600 font-light leading-relaxed">{milestone.desc}</p>
-                    <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-orange-600 transition-colors">
+                    <button className="rounded-[10px] flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-orange-600 transition-colors">
                       Leer mas <ArrowUpRight size={14} />
                     </button>
                   </div>

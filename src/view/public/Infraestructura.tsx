@@ -101,7 +101,7 @@ const Infraestructura = () => {
                                     <p className="text-lg text-slate-500 font-light leading-relaxed">
                                         {space.desc}
                                     </p>
-                                    <button className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
+                                    <button className="rounded-[10px] flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
                                         Ver Detalles <ChevronRight size={18} className="translate-x-0 group-hover:translate-x-2 transition-transform opacity-30 group-hover:opacity-100" />
                                     </button>
                                 </div>
@@ -127,7 +127,7 @@ const Infraestructura = () => {
                             Le invitamos a conocer nuestras instalaciones desde cualquier rincón del mundo a través de nuestra experiencia de realidad virtual inmersiva.
                         </p>
                         <div className="pt-8">
-                            <button className="bg-white text-[#0a0a0c] px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all shadow-2xl shadow-white/5">
+                            <button className="bg-white text-[#0a0a0c] px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 hover:text-white transition-all shadow-2xl shadow-white/5">
                                 Iniciar Tour Virtual
                             </button>
                         </div>
@@ -147,10 +147,10 @@ const Infraestructura = () => {
                             El mejor lugar para <br /> <span className="italic text-orange-600">crecer y brillar.</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
+                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
                                 Programar Visita Presencial
                             </Link>
-                            <Link to="/contacto" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-900 hover:bg-slate-900 hover:text-white transition-all">
+                            <Link to="/contacto" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-900 hover:bg-slate-900 hover:text-white transition-all">
                                 Consultar Ubicación
                             </Link>
                         </div>

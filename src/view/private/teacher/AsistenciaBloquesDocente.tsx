@@ -179,12 +179,12 @@ export default function AsistenciaBloquesDocente() {
         <div className="bg-white border rounded p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <label className="text-xs text-slate-600 font-medium">Fecha <span className="text-red-500">*</span></label>
-            <input type="date" className="w-full h-9 mt-1 border rounded px-2 text-sm" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+            <input type="date" className="w-full h-9 mt-1 border rounded-[4px] px-2 text-sm" value={fecha} onChange={(e) => setFecha(e.target.value)} />
           </div>
 
           <div className="md:col-span-2">
             <label className="text-xs text-slate-600 font-medium">Curso / Grado <span className="text-red-500">*</span></label>
-            <select className="w-full h-9 mt-1 border rounded px-2 text-sm" value={idHorario} onChange={(e) => setIdHorario(e.target.value)}>
+            <select className="w-full h-9 mt-1 border rounded-[4px] px-2 text-sm" value={idHorario} onChange={(e) => setIdHorario(e.target.value)}>
               <option value="">Seleccionar curso</option>
               {bloques.map((b) => (
                 <option key={b.id_horario} value={b.id_horario}>
@@ -242,7 +242,7 @@ export default function AsistenciaBloquesDocente() {
                         type="text"
                         value={a.observacion || ""}
                         onChange={(e) => onChangeObs(a.id_alumno, e.target.value)}
-                        className="w-full h-8 border rounded px-2"
+                        className="w-full h-8 border rounded-[4px] px-2"
                         placeholder="Observación"
                       />
                     </td>
@@ -257,7 +257,7 @@ export default function AsistenciaBloquesDocente() {
           <button
             onClick={guardar}
             disabled={saving || !bloqueSeleccionado?.puede_registrar || alumnos.length === 0 || yaRegistrada}
-            className="h-9 px-4 rounded bg-blue-600 text-white text-sm font-semibold inline-flex items-center gap-2 disabled:opacity-50"
+            className="h-9 px-4 rounded-[10px] bg-blue-600 text-white text-sm font-semibold inline-flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="w-4 h-4" /> {saving ? "Guardando..." : "Guardar asistencia del bloque"}
           </button>

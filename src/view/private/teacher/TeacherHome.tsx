@@ -88,7 +88,7 @@ export default function TeacherHome() {
             color: "text-emerald-600",
             bg: "bg-emerald-50",
             border: "border-emerald-100",
-            path: "/teacher/reporte-clases",
+            path: "/teacher/reportes-bloques",
         },
         {
             icon: BookOpen,
@@ -209,7 +209,7 @@ export default function TeacherHome() {
                             <button
                                 key={i}
                                 onClick={() => navigate(action.path)}
-                                className={`flex items-center gap-4 p-4 rounded-xl border ${action.border} ${action.bg} hover:opacity-90 active:scale-[0.98] transition-all text-left group`}
+                                className={`flex items-center gap-4 p-4 rounded-[10px] border ${action.border} ${action.bg} hover:opacity-90 active:scale-[0.98] transition-all text-left group`}
                             >
                                 <div className={`w-10 h-10 rounded-lg bg-white shadow-sm flex items-center justify-center`}>
                                     <action.icon className={`w-5 h-5 ${action.color}`} />

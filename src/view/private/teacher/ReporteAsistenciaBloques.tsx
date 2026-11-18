@@ -210,11 +210,11 @@ export default function ReporteAsistenciaBloques() {
         <div className="bg-white border rounded p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
             <label className="text-xs font-medium text-slate-600">Fecha</label>
-            <input type="date" className="w-full h-9 mt-1 border rounded px-2 text-sm" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+            <input type="date" className="w-full h-9 mt-1 border rounded-[4px] px-2 text-sm" value={fecha} onChange={(e) => setFecha(e.target.value)} />
           </div>
           <div>
             <label className="text-xs font-medium text-slate-600">Bloque</label>
-            <select className="w-full h-9 mt-1 border rounded px-2 text-sm" value={idHorario} onChange={(e) => setIdHorario(e.target.value)}>
+            <select className="w-full h-9 mt-1 border rounded-[4px] px-2 text-sm" value={idHorario} onChange={(e) => setIdHorario(e.target.value)}>
               <option value="">Seleccionar</option>
               {bloques.map((b) => (
                 <option key={b.id_horario} value={b.id_horario}>{`${b.curso} | ${b.grado} ${b.seccion || ""} | ${String(b.hora_inicio).slice(0, 5)}-${String(b.hora_fin).slice(0, 5)}`}</option>
@@ -222,11 +222,11 @@ export default function ReporteAsistenciaBloques() {
             </select>
           </div>
           <div className="flex items-end">
-            <button onClick={fetchReporteBloque} className="w-full h-9 rounded bg-blue-600 text-white text-sm font-semibold">Reporte por bloque</button>
+            <button onClick={fetchReporteBloque} className="w-full h-9 rounded-[10px] bg-blue-600 text-white text-sm font-semibold">Reporte por bloque</button>
           </div>
           <div className="flex items-end gap-2">
-            <button onClick={exportarExcel} className="h-9 px-3 rounded bg-emerald-600 text-white text-sm inline-flex items-center gap-1"><Download className="w-4 h-4" /> Excel</button>
-            <button onClick={exportarPdf} className="h-9 px-3 rounded bg-slate-700 text-white text-sm inline-flex items-center gap-1"><Download className="w-4 h-4" /> PDF</button>
+            <button onClick={exportarExcel} className="h-9 px-3 rounded-[10px] bg-emerald-600 text-white text-sm inline-flex items-center gap-1"><Download className="w-4 h-4" /> Excel</button>
+            <button onClick={exportarPdf} className="h-9 px-3 rounded-[10px] bg-slate-700 text-white text-sm inline-flex items-center gap-1"><Download className="w-4 h-4" /> PDF</button>
           </div>
         </div>
 
@@ -269,7 +269,7 @@ export default function ReporteAsistenciaBloques() {
         <div className="bg-white border rounded p-4 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-slate-800">Reporte diario por curso/grado</h2>
-            <button onClick={fetchReporteDiario} className="h-8 px-3 rounded bg-blue-600 text-white text-xs font-semibold">Actualizar</button>
+            <button onClick={fetchReporteDiario} className="h-8 px-3 rounded-[10px] bg-blue-600 text-white text-xs font-semibold">Actualizar</button>
           </div>
           <div className="text-xs text-slate-500">Bloques del día: <b>{totalBloquesDiario}</b></div>
           <div className="overflow-x-auto border rounded">
@@ -309,10 +309,10 @@ export default function ReporteAsistenciaBloques() {
         <div className="bg-white border rounded p-4 space-y-3">
           <h2 className="text-sm font-semibold text-slate-800">Reporte por alumno (rango)</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <input className="h-9 border rounded px-2 text-sm" placeholder="ID Alumno" value={idAlumno} onChange={(e) => setIdAlumno(e.target.value)} />
-            <input type="date" className="h-9 border rounded px-2 text-sm" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
-            <input type="date" className="h-9 border rounded px-2 text-sm" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} />
-            <button onClick={fetchReporteAlumno} className="h-9 rounded bg-blue-600 text-white text-sm font-semibold">Consultar alumno</button>
+            <input className="h-9 border rounded-[4px] px-2 text-sm" placeholder="ID Alumno" value={idAlumno} onChange={(e) => setIdAlumno(e.target.value)} />
+            <input type="date" className="h-9 border rounded-[4px] px-2 text-sm" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
+            <input type="date" className="h-9 border rounded-[4px] px-2 text-sm" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} />
+            <button onClick={fetchReporteAlumno} className="h-9 rounded-[10px] bg-blue-600 text-white text-sm font-semibold">Consultar alumno</button>
           </div>
 
           <div className="text-sm text-slate-700">Porcentaje de asistencia: <b>{porcentaje}%</b></div>

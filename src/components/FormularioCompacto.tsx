@@ -6,7 +6,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 // Controles compactos de la intranet (mismo estilo que NuevaOrdenModal de lessa)
 
 export const claseInput =
-  "h-[28px] w-full px-2 text-xs border border-slate-300 rounded-[5px] bg-white text-slate-800 outline-none focus:border-blue-500 disabled:opacity-60 disabled:bg-slate-50";
+  "h-[28px] w-full px-2 text-xs border border-slate-300 rounded-[4px] bg-white text-slate-800 outline-none focus:border-blue-500 disabled:opacity-60 disabled:bg-slate-50";
 
 /** Marca un input/select con borde rojo cuando tiene error */
 export const conError = (clase: string, error: boolean) =>
@@ -142,7 +142,7 @@ export function BotonCompacto({
     <button
       type="button"
       {...props}
-      className={`inline-flex h-[28px] cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[5px] px-3 text-[11px] font-bold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${claseVariante[variante]} ${className}`}
+      className={`inline-flex h-[28px] cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3 text-[11px] font-bold uppercase tracking-wide transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${claseVariante[variante]} ${className}`}
     >
       {cargando ? (
         <span className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -171,7 +171,7 @@ export function BotonIcono({
     <button
       type="button"
       {...props}
-      className={`inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[5px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${color} ${className}`}
+      className={`inline-flex h-[22px] w-[22px] cursor-pointer items-center justify-center rounded-[10px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${color} ${className}`}
     >
       <Icono size={13} />
     </button>
@@ -209,7 +209,7 @@ export function PaginacionCompacta({
 }) {
   if (totalPaginas <= 1) return null;
   const claseBoton =
-    "h-[24px] cursor-pointer rounded-[5px] border border-slate-300 bg-white px-2.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 disabled:cursor-default disabled:opacity-40";
+    "h-[24px] cursor-pointer rounded-[10px] border border-slate-300 bg-white px-2.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-50 disabled:cursor-default disabled:opacity-40";
   return (
     <div className="mt-2 flex items-center justify-end gap-2 border-t border-slate-100 pt-2">
       {total !== undefined && (

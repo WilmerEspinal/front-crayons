@@ -104,7 +104,7 @@ const ArteCultura = () => {
                                     </div>
 
                                     <div className="pt-6">
-                                        <button className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
+                                        <button className="rounded-[10px] flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
                                             Ver Proyectos <ChevronRight size={18} className="translate-x-0 group-hover:translate-x-2 transition-transform" />
                                         </button>
                                     </div>
@@ -149,10 +149,10 @@ const ArteCultura = () => {
                             Despierte el genio <br /> que vive en su <span className="italic text-orange-600">interior.</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
+                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
                                 Solicitar Información
                             </Link>
-                            <Link to="/contacto" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-[#0D101C] border-2 border-[#0D101C] hover:bg-[#0D101C] hover:text-white transition-all">
+                            <Link to="/contacto" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-[#0D101C] border-2 border-[#0D101C] hover:bg-[#0D101C] hover:text-white transition-all">
                                 Ver Calendario Cultural
                             </Link>
                         </div>

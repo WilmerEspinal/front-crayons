@@ -144,10 +144,10 @@ const Deporte = () => {
                             Únase al equipo <br /> de los <span className="italic text-orange-600">campeones.</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 hover:scale-105 transition-all">
+                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 hover:scale-105 transition-all">
                                 Solicitar Admisión
                             </Link>
-                            <Link to="/contacto" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-[#0D101C] border-2 border-[#0D101C] hover:bg-[#0D101C] hover:text-white transition-all">
+                            <Link to="/contacto" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-[#0D101C] border-2 border-[#0D101C] hover:bg-[#0D101C] hover:text-white transition-all">
                                 Ver Calendario Deportivo
                             </Link>
                         </div>

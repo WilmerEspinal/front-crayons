@@ -377,7 +377,9 @@ export default function ListStudent() {
             type="text"
             placeholder="Ingrese DNI..."
             value={dniSearch}
-            onChange={(e) => setDniSearch(e.target.value)}
+            inputMode="numeric"
+            maxLength={8}
+            onChange={(e) => setDniSearch(e.target.value.replace(/\D/g, "").slice(0, 8))}
             className="w-48 h-9 bg-white border border-slate-300 rounded px-3 text-sm focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500"
           />
         </div>
@@ -595,7 +597,7 @@ export default function ListStudent() {
                     onClick={cerrar}
                     disabled={guardando}
                     aria-label="Cerrar"
-                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[5px] bg-slate-100 text-slate-500 hover:text-slate-900"
+                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-[10px] bg-slate-100 text-slate-500 hover:text-slate-900"
                   >
                     <X size={16} />
                   </button>
@@ -677,7 +679,7 @@ export default function ListStudent() {
             {modalConfig.showCancel && (
               <button
                 onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
-                className="flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
+                className="rounded-[10px] flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
               >
                 {modalConfig.cancelText || "Cancelar"}
               </button>
@@ -687,7 +689,7 @@ export default function ListStudent() {
                 if (modalConfig.onConfirm) modalConfig.onConfirm();
                 setModalConfig(prev => ({ ...prev, isOpen: false }));
               }}
-              className={`flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
+              className={`rounded-[10px] flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
                 }`}
             >
               {modalConfig.confirmText || "Aceptar"}
@@ -740,7 +742,7 @@ function FilaAlumno({ student, verDetalle, verHistorial, abrirCambioEstado, disa
         <button
           type="button"
           onClick={() => verDetalle(student)}
-          className="cursor-pointer font-semibold text-blue-700 hover:underline"
+          className="rounded-[10px] cursor-pointer font-semibold text-blue-700 hover:underline"
           title="Ver detalle del alumno y apoderados"
         >
           {student.alumno_dni}
@@ -759,7 +761,7 @@ function FilaAlumno({ student, verDetalle, verHistorial, abrirCambioEstado, disa
             type="button"
             onClick={() => verHistorial(student)}
             title="Ver historial y observaciones del estado"
-            className="cursor-pointer"
+            className="rounded-[10px] cursor-pointer"
           >
             <Badge className={`${claseEstado} underline-offset-2 hover:underline`}>
               {student.estado_nombre || student.estado}

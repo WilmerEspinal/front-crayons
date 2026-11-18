@@ -129,7 +129,7 @@ const Pilares = () => {
                                     </div>
 
                                     <div className="pt-6">
-                                        <button className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
+                                        <button className="rounded-[10px] flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
                                             Explorar este pilar
                                             <ArrowRight size={18} className="translate-x-0 group-hover:translate-x-2 transition-transform opacity-30 group-hover:opacity-100" />
                                         </button>
@@ -148,10 +148,10 @@ const Pilares = () => {
                         ¿Listo para formar parte <br /> de nuestra visión?
                     </h3>
                     <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                        <Link to="/admision" className="bg-orange-600 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-orange-600/20">
+                        <Link to="/admision" className="bg-orange-600 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-orange-600/20">
                             Proceso de Admisión
                         </Link>
-                        <Link to="/contacto" className="bg-white/5 border border-white/10 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+                        <Link to="/contacto" className="bg-white/5 border border-white/10 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
                             Agendar Visita
                         </Link>
                     </div>

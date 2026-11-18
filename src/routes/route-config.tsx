@@ -26,6 +26,8 @@ import Valores from "@/view/public/Valores";
 import Pilares from "@/view/public/Pilares";
 import Infraestructura from "@/view/public/Infraestructura";
 import Comunidad from "@/view/public/Comunidad";
+import Privacidad from "@/view/public/Privacidad";
+import TerminosCondiciones from "@/view/public/TerminosCondiciones";
 
 import Bienvenida from "@/view/public/Bienvenida";
 import EarlyYears from "@/view/public/EarlyYears";
@@ -71,6 +73,8 @@ const router = createBrowserRouter([
       { path: "tecnologia", element: <Tecnologia /> },
       { path: "deporte", element: <Deporte /> },
       { path: "arte", element: <ArteCultura /> },
+      { path: "privacidad", element: <Privacidad /> },
+      { path: "terminos", element: <TerminosCondiciones /> },
 
 
       { path: "/", element: <Body /> },

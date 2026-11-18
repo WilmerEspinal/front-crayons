@@ -119,10 +119,10 @@ const Admision = () => {
                                         Nuestro equipo de admisiones está disponible para brindarle una atención personalizada.
                                     </p>
                                     <div className="space-y-4 pt-4">
-                                        <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                                        <button className="w-full bg-orange-600 hover:bg-orange-700 text-white py-5 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
                                             Guía de Admisión PDF <Download size={16} />
                                         </button>
-                                        <button className="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-white py-5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all">
+                                        <button className="w-full bg-white/5 border border-white/10 hover:bg-white/10 text-white py-5 rounded-[10px] text-[10px] font-black uppercase tracking-widest transition-all">
                                             Preguntas Frecuentes
                                         </button>
                                     </div>
@@ -141,10 +141,10 @@ const Admision = () => {
                             Comience la <br /> <span className="italic text-orange-600">Aventura.</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Link to="/contacto" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
+                            <Link to="/contacto" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
                                 Solicitar Vacante
                             </Link>
-                            <Link to="/espacio" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-[#0a0a0c] border-2 border-[#0a0a0c] hover:bg-[#0a0a0c] hover:text-white transition-all">
+                            <Link to="/espacio" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-[#0a0a0c] border-2 border-[#0a0a0c] hover:bg-[#0a0a0c] hover:text-white transition-all">
                                 Visitar el Campus
                             </Link>
                         </div>

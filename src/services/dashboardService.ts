@@ -102,7 +102,23 @@ export interface DashboardSummaryData {
     monto_esperado_mes: string;
     monto_esperado_anio: string;
     periodo_activo: number;
+    alumnas_activas: number;
+    alumnos_varones_activos: number;
+    alumnos_retirados: number;
+    alumnos_expulsados: number;
+    alumnos_egresados: number;
+    docentes_mujeres: number;
+    docentes_varones: number;
+    apoderados_con_acceso: number;
+    apoderados_total: number;
+    justificaciones_pendientes: number;
   };
+  alumnos_por_grado?: {
+    grado: string;
+    mujeres: number;
+    varones: number;
+    total: number;
+  }[];
   distribucion_sexo: {
     sexo: string;
     cantidad: number;

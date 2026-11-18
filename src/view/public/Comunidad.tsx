@@ -146,10 +146,10 @@ const Comunidad = () => {
                                     </div>
 
                                     <div className="flex flex-col sm:flex-row gap-6">
-                                        <Link to="/login" className="bg-white text-[#0a0a0c] px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-center hover:bg-orange-600 hover:text-white transition-all">
+                                        <Link to="/login" className="bg-white text-[#0a0a0c] px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-center hover:bg-orange-600 hover:text-white transition-all">
                                             Acceder a Intranet
                                         </Link>
-                                        <button className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-white border border-white/20 hover:bg-white/5 transition-all flex items-center justify-center gap-2">
+                                        <button className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-white border border-white/20 hover:bg-white/5 transition-all flex items-center justify-center gap-2">
                                             Soporte Técnico <MessageSquare size={16} />
                                         </button>
                                     </div>
@@ -190,10 +190,10 @@ const Comunidad = () => {
                             Sea parte de una <br /> historia con <span className="italic text-orange-600">propósito.</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
+                            <Link to="/admision" className="bg-slate-900 text-white px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all">
                                 Unirse a Crayon's
                             </Link>
-                            <Link to="/contacto" className="px-12 py-5 rounded-full text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-900 hover:bg-slate-900 hover:text-white transition-all">
+                            <Link to="/contacto" className="px-12 py-5 rounded-[10px] text-[11px] font-black uppercase tracking-widest text-slate-900 border-2 border-slate-900 hover:bg-slate-900 hover:text-white transition-all">
                                 Solicitar Visita
                             </Link>
                         </div>

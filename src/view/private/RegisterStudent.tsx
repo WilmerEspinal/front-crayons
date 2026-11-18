@@ -122,6 +122,11 @@ interface ErrorResponse {
 const esCampoMayuscula = (campo: string) =>
   !campo.includes("email") && !campo.includes("fecha") && !campo.includes("sexo");
 
+// DNI 8 digitos y telefono 9 digitos, solo numeros
+const LIMITE_DIGITOS: Record<string, number> = { dni: 8, telefono: 9 };
+const limiteDigitos = (campo: string) =>
+  campo.endsWith("_dni") ? LIMITE_DIGITOS.dni : campo.endsWith("_telefono") ? LIMITE_DIGITOS.telefono : 0;
+
 export default function RegisterStudent() {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
@@ -233,9 +238,8 @@ export default function RegisterStudent() {
         body: formDataPdf,
       });
 
-      if (!response.ok) throw new Error(`Error: ${response.status}`);
-
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `Error: ${response.status}`);
 
       if (data.success && data.datos) {
         const ext = data.datos;
@@ -260,7 +264,7 @@ export default function RegisterStudent() {
           alumno_fecha_nacimiento: formatDateForInput(student.fecha_nacimiento) || prev.alumno_fecha_nacimiento,
           alumno_sexo: sexoMapeado || prev.alumno_sexo,
           alumno_lengua_materna: student.lengua_materna || prev.alumno_lengua_materna,
-          alumno_direccion: student.lugar_nacimiento ? `${student.lugar_nacimiento.departamento}, ${student.lugar_nacimiento.provincia}, ${student.lugar_nacimiento.distrito}` : prev.alumno_direccion,
+          alumno_direccion: student.direccion || prev.alumno_direccion,
 
           // Padre
           padre_dni: padre.numero_documento ? padre.numero_documento.toString() : prev.padre_dni,
@@ -480,7 +484,9 @@ export default function RegisterStudent() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
+    const maxDigitos = limiteDigitos(name);
     const newValue = type === "checkbox" ? checked :
+      maxDigitos ? String(value).replace(/\D/g, "").slice(0, maxDigitos) :
       (type === "number" && !name.includes('dni') && !name.includes('telefono')) ? Number(value) :
       esCampoMayuscula(name) ? value.toUpperCase() : value;
 
@@ -584,6 +590,8 @@ export default function RegisterStudent() {
         id={name}
         name={name}
         type={type}
+        inputMode={limiteDigitos(name) ? "numeric" : undefined}
+        maxLength={limiteDigitos(name) || undefined}
         value={type === 'number' && typeof formData[name] === 'number' && formData[name] === 0 ? '' : formData[name] as string | number}
         onChange={handleInputChange}
         placeholder={placeholder}
@@ -1028,7 +1036,7 @@ export default function RegisterStudent() {
               {/* DNI + Buscar */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                  {renderInput("alumno_dni", "DNI del Alumno", "number")}
+                  {renderInput("alumno_dni", "DNI del Alumno", "text")}
                 </div>
                 <div className="flex items-end">
                   <Button
@@ -1118,7 +1126,9 @@ export default function RegisterStudent() {
                     DNI <span className="text-red-500"> *</span>
                   </Label>
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={8}
                     placeholder="Número de documento"
                     className={clsx(
                       "mt-1 h-9",
@@ -1215,8 +1225,10 @@ export default function RegisterStudent() {
                     Teléfono <span className="text-red-500"> *</span>
                   </Label>
                   <Input
-                    type="number"
-                    placeholder="900 000 000"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={9}
+                    placeholder="900000000"
                     className={clsx(
                       "mt-1 h-9",
                       errors[`${activeTab}_telefono`] && "border-red-500"

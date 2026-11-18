@@ -281,6 +281,10 @@ const CuotasDetalle = () => {
     }
   };
 
+  // Cuotas que aun se pueden cobrar y cuotas que ya no se deben (pagadas o condonadas por retiro)
+  const esCobrable = (estado: string) => ['PENDIENTE', 'PARCIAL', 'VENCIDA'].includes((estado || '').toUpperCase());
+  const estaSaldada = (estado: string) => /PAGAD|CONDONADA/.test((estado || '').toUpperCase());
+
   const getEstadoBadge = (estado: string) => {
     const estadoUpper = (estado || '').toUpperCase();
     switch (estadoUpper) {
@@ -291,6 +295,10 @@ const CuotasDetalle = () => {
         return <Badge variant="destructive">PENDIENTE</Badge>;
       case 'PARCIAL':
         return <Badge className="bg-blue-100 text-blue-700 border-blue-200">PARCIAL</Badge>;
+      case 'VENCIDA':
+        return <Badge className="bg-red-600 text-white border-red-600">VENCIDA</Badge>;
+      case 'CONDONADA':
+        return <Badge className="bg-slate-100 text-slate-600 border-slate-200">CONDONADA</Badge>;
       default:
         return <Badge variant="outline">{estado}</Badge>;
     }
@@ -313,7 +321,7 @@ const CuotasDetalle = () => {
         await api.post(`/cuotas/pagar`, {
           dni: datosEstudiante.dni,
           anio: año,
-          tipo: 'Cuota',
+          tipo: 'Mensualidad',
           numero_cuota: cuotaSeleccionada.numero_cuota,
           metodo_pago: 'Efectivo',
           presencial: false
@@ -430,7 +438,9 @@ const CuotasDetalle = () => {
                     placeholder="Ingrese DNI del estudiante"
                     className="pl-10 h-9 bg-white border border-slate-300 rounded text-sm focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500"
                     value={dni}
-                    onChange={(e) => setDni(e.target.value)}
+                    inputMode="numeric"
+                    maxLength={8}
+                    onChange={(e) => setDni(e.target.value.replace(/\D/g, "").slice(0, 8))}
                     onKeyDown={(e) => e.key === 'Enter' && buscarEstudiante()}
                   />
                 </div>
@@ -529,7 +539,7 @@ const CuotasDetalle = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           {getEstadoBadge(matriculaInfo.estado)}
-                          {(matriculaInfo.estado.toUpperCase() === 'PENDIENTE' || matriculaInfo.estado.toUpperCase() === 'PARCIAL') && (
+                          {esCobrable(matriculaInfo.estado) && (
                             <Button
                               size="sm"
                               variant="outline"
@@ -590,13 +600,13 @@ const CuotasDetalle = () => {
                           cuotasMensuales.map((cuota) => (
                             <TableRow key={cuota.id} className="hover:bg-gray-50 transition-colors">
                               <TableCell className="font-medium">Cuota {cuota.numero_cuota}</TableCell>
-                              <TableCell className={new Date(cuota.fecha_vencimiento) < new Date(new Date().setHours(0, 0, 0, 0)) && !cuota.estado.toUpperCase().includes('PAGAD') ? 'text-red-600 font-semibold' : 'text-gray-600'}>
+                              <TableCell className={new Date(cuota.fecha_vencimiento) < new Date(new Date().setHours(0, 0, 0, 0)) && !estaSaldada(cuota.estado) ? 'text-red-600 font-semibold' : 'text-gray-600'}>
                                 {new Date(cuota.fecha_vencimiento).toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
                               </TableCell>
                               <TableCell className="font-mono font-medium">S/ {parseFloat(cuota.monto).toFixed(2)}</TableCell>
                               <TableCell>{getEstadoBadge(cuota.estado)}</TableCell>
                               <TableCell className="text-right">
-                                {(cuota.estado.toUpperCase() === 'PENDIENTE' || cuota.estado.toUpperCase() === 'PARCIAL') && (
+                                {esCobrable(cuota.estado) && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
@@ -799,7 +809,7 @@ const CuotasDetalle = () => {
                                         <TableRow key={det.id} className="text-xs hover:bg-gray-50">
                                           <TableCell className="font-medium">{det.tipo}</TableCell>
                                           <TableCell>{det.numero_cuota || '-'}</TableCell>
-                                          <TableCell className={new Date(det.fecha_vencimiento) < new Date(new Date().setHours(0, 0, 0, 0)) && !det.estado.toUpperCase().includes('PAGAD') ? 'text-red-600 font-semibold' : ''}>
+                                          <TableCell className={new Date(det.fecha_vencimiento) < new Date(new Date().setHours(0, 0, 0, 0)) && !estaSaldada(det.estado) ? 'text-red-600 font-semibold' : ''}>
                                             {new Date(det.fecha_vencimiento).toLocaleDateString()}
                                           </TableCell>
                                           <TableCell>S/ {parseFloat(det.monto).toFixed(2)}</TableCell>
@@ -1179,7 +1189,7 @@ const CuotasDetalle = () => {
             {modalConfig.showCancel && (
               <button
                 onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
-                className="flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
+                className="rounded-[10px] flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
               >
                 {modalConfig.cancelText || "Cancelar"}
               </button>
@@ -1189,7 +1199,7 @@ const CuotasDetalle = () => {
                 if (modalConfig.onConfirm) modalConfig.onConfirm();
                 setModalConfig(prev => ({ ...prev, isOpen: false }));
               }}
-              className={`flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
+              className={`rounded-[10px] flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
                 }`}
             >
               {modalConfig.confirmText || "Aceptar"}

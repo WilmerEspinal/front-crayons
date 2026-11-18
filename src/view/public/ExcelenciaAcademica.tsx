@@ -112,7 +112,7 @@ const ExcelenciaAcademica = () => {
                                         </p>
                                     </div>
                                     <div className="pt-6">
-                                        <button className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
+                                        <button className="rounded-[10px] flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-900 hover:text-orange-600 transition-colors group">
                                             Plan Curricular <ArrowRight size={18} className="translate-x-0 group-hover:translate-x-2 transition-transform" />
                                         </button>
                                     </div>

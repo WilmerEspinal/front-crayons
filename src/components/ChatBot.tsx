@@ -1,6 +1,7 @@
 import React from "react";
 import { Bot, X, Send, Loader2, Sparkles, ChevronDown } from "lucide-react";
 import api from "@/lib/axios";
+import MensajeAsistente from "@/components/MensajeAsistente";
 
 type ChatMessage = {
   id: string;
@@ -44,7 +45,12 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
-      const { data } = await api.post("/ai-assistant", { pregunta: trimmed });
+      // Ultimos mensajes para que pueda entender preguntas de seguimiento
+      const historial = messages
+        .filter((m) => m.id !== "welcome")
+        .slice(-4)
+        .map((m) => ({ rol: m.role, texto: m.text }));
+      const { data } = await api.post("/ai-assistant", { pregunta: trimmed, historial });
       setMessages((prev) => [
         ...prev,
         {
@@ -60,6 +66,7 @@ export default function ChatBot() {
           id: crypto.randomUUID(),
           role: "assistant",
           text:
+            error?.response?.data?.error ||
             error?.response?.data?.message ||
             "Ocurrió un error al consultar el asistente. Inténtalo de nuevo.",
         },
@@ -81,7 +88,7 @@ export default function ChatBot() {
       {/* Floating Button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 ${open
+        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-[10px] shadow-xl flex items-center justify-center transition-all duration-300 ${open
           ? "bg-slate-800"
           : "bg-gradient-to-br from-blue-600 to-indigo-600 hover:scale-105 hover:shadow-2xl hover:shadow-blue-200"
           }`}
@@ -116,7 +123,7 @@ export default function ChatBot() {
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="text-white/70 hover:text-white transition-colors"
+            className="rounded-[10px] text-white/70 hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -138,12 +145,12 @@ export default function ChatBot() {
                 </div>
               )}
               <div
-                className={`max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed ${msg.role === "user"
+                className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed ${msg.role === "user"
                   ? "bg-blue-600 text-white rounded-br-none"
                   : "bg-slate-100 text-slate-800 rounded-bl-none"
                   }`}
               >
-                <p>{msg.text}</p>
+                {msg.role === "assistant" ? <MensajeAsistente texto={msg.text} /> : <p>{msg.text}</p>}
 
               </div>
             </div>
@@ -178,13 +185,13 @@ export default function ChatBot() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Escribe tu pregunta..."
-              className="flex-1 bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
+              className="rounded-[4px] flex-1 bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
               disabled={loading}
             />
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
+              className="w-7 h-7 rounded-[10px] bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white flex items-center justify-center transition-all active:scale-95 flex-shrink-0"
             >
               {loading ? (
                 <Loader2 className="w-3 h-3 animate-spin" />

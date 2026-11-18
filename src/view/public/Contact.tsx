@@ -50,17 +50,17 @@ const Contact = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-3">
                                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Nombre Completo</label>
-                                            <input type="text" className="w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 placeholder:text-slate-200" placeholder="Ej. Alejandra Valdivia" />
+                                            <input type="text" className="rounded-[4px] w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 placeholder:text-slate-200" placeholder="Ej. Alejandra Valdivia" />
                                         </div>
                                         <div className="space-y-3">
                                             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Institucional/Personal</label>
-                                            <input type="email" className="w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 placeholder:text-slate-200" placeholder="email@ejemplo.com" />
+                                            <input type="email" className="rounded-[4px] w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 placeholder:text-slate-200" placeholder="email@ejemplo.com" />
                                         </div>
                                     </div>
 
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Motivo del Contacto</label>
-                                        <select className="w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 appearance-none cursor-pointer">
+                                        <select className="rounded-[4px] w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 appearance-none cursor-pointer">
                                             <option>Información de Admisión 2026</option>
                                             <option>Consulta Académica</option>
                                             <option>Alianzas e Institucional</option>
@@ -70,10 +70,10 @@ const Contact = () => {
 
                                     <div className="space-y-3">
                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Su Mensaje</label>
-                                        <textarea rows={4} className="w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 placeholder:text-slate-200 resize-none" placeholder="Cuéntenos cómo podemos ayudarle..."></textarea>
+                                        <textarea rows={4} className="rounded-[4px] w-full bg-white border-b-2 border-slate-100 px-0 py-4 text-sm focus:outline-none focus:border-orange-500 transition-all font-medium text-slate-900 placeholder:text-slate-200 resize-none" placeholder="Cuéntenos cómo podemos ayudarle..."></textarea>
                                     </div>
 
-                                    <button className="bg-slate-900 text-white px-12 py-6 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-orange-600 transition-all flex items-center justify-center gap-3 group">
+                                    <button className="bg-slate-900 text-white px-12 py-6 rounded-[10px] text-[10px] font-black uppercase tracking-[0.3em] hover:bg-orange-600 transition-all flex items-center justify-center gap-3 group">
                                         Enviar Comunicación <Send size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                     </button>
                                 </form>
@@ -108,7 +108,7 @@ const Contact = () => {
                                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Presencia Digital</h3>
                                 <div className="flex gap-6">
                                     {[Facebook, Instagram, Youtube].map((Icon, i) => (
-                                        <a key={i} href="#" className="w-14 h-14 rounded-full border border-slate-100 flex items-center justify-center text-slate-900 hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-500">
+                                        <a key={i} href="#" className="w-14 h-14 rounded-[10px] border border-slate-100 flex items-center justify-center text-slate-900 hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all duration-500">
                                             <Icon size={20} strokeWidth={1.5} />
                                         </a>
                                     ))}
@@ -119,7 +119,7 @@ const Contact = () => {
                                 <MessageSquare size={32} />
                                 <h4 className="text-2xl font-serif italic">¿Prefiere WhatsApp?</h4>
                                 <p className="text-sm font-light text-orange-50 leading-relaxed">Atención inmediata para consultas rápidas sobre procesos de admisión y vacantes.</p>
-                                <button className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest bg-white text-orange-600 px-8 py-3 rounded-full hover:scale-105 transition-all">
+                                <button className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest bg-white text-orange-600 px-8 py-3 rounded-[10px] hover:scale-105 transition-all">
                                     Iniciar Chat <ChevronRight size={14} />
                                 </button>
                             </div>

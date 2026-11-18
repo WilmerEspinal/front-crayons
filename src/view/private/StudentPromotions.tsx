@@ -270,7 +270,7 @@ export default function PromocionAlumnos() {
                   appearance: "none",
                   background: "#eff6ff",
                   border: "1px solid #bfdbfe",
-                  borderRadius: 6,
+                  borderRadius: 4,
                   padding: "5px 28px 5px 10px",
                   fontSize: 13,
                   fontWeight: 600,
@@ -328,7 +328,7 @@ export default function PromocionAlumnos() {
                   flex: "0 0 auto",
                   background: active ? "#2563eb" : "#fff",
                   border: active ? "1px solid #2563eb" : "1px solid #e2e4e9",
-                  borderRadius: 7,
+                  borderRadius: 10,
                   padding: "7px 16px",
                   cursor: "pointer",
                   transition: "all 0.15s",
@@ -364,7 +364,7 @@ export default function PromocionAlumnos() {
                   <select
                     value={gradoOrigenId}
                     onChange={(e) => { setGradoOrigenId(e.target.value); setSeleccionados([]); }}
-                    style={{ border: "1px solid #e2e4e9", borderRadius: 6, padding: "5px 8px", fontSize: 13, fontWeight: 600, color: "#111827", background: "#f9fafb", outline: "none" }}
+                    style={{ border: "1px solid #e2e4e9", borderRadius: 4, padding: "5px 8px", fontSize: 13, fontWeight: 600, color: "#111827", background: "#f9fafb", outline: "none" }}
                   >
                     {grados.map((g) => <option key={g.id} value={g.id}>{g.nombre}</option>)}
                   </select>
@@ -384,7 +384,7 @@ export default function PromocionAlumnos() {
                         const p = todoPeriodos.find(x => String(x.id) === e.target.value);
                         setPeriodoSiguiente(p || null);
                       }}
-                      style={{ border: "1px solid #bfdbfe", borderRadius: 6, padding: "5px 8px", fontSize: 13, fontWeight: 600, color: "#1d4ed8", background: "#eff6ff", outline: "none" }}
+                      style={{ border: "1px solid #bfdbfe", borderRadius: 4, padding: "5px 8px", fontSize: 13, fontWeight: 600, color: "#1d4ed8", background: "#eff6ff", outline: "none" }}
                     >
                       {todoPeriodos
                         .filter(p => !periodoActual || p.anio > periodoActual.anio)
@@ -406,7 +406,7 @@ export default function PromocionAlumnos() {
                   <select
                     value={seccionFiltro}
                     onChange={(e) => { setSeccionFiltro(e.target.value); setSeleccionados([]); }}
-                    style={{ border: "1px solid #e2e4e9", borderRadius: 6, padding: "5px 8px", fontSize: 13, color: "#374151", background: "#f9fafb", outline: "none" }}
+                    style={{ border: "1px solid #e2e4e9", borderRadius: 4, padding: "5px 8px", fontSize: 13, color: "#374151", background: "#f9fafb", outline: "none" }}
                   >
                     {secciones.map((s) => <option key={s}>{s}</option>)}
                   </select>
@@ -419,7 +419,7 @@ export default function PromocionAlumnos() {
                     <button
                       onClick={() => setConfirmando("seleccion")}
                       disabled={periodoActual?.activo === 0}
-                      style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, padding: "7px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
+                      style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "7px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
                     >
                       Promover {seleccionados.length} seleccionado{seleccionados.length > 1 ? "s" : ""}
                     </button>
@@ -427,7 +427,7 @@ export default function PromocionAlumnos() {
                     <button
                       onClick={() => setConfirmando("egreso")}
                       disabled={periodoActual?.activo === 0}
-                      style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 6, padding: "7px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
+                      style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 10, padding: "7px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
                     >
                       Egresar {seleccionados.length} seleccionado{seleccionados.length > 1 ? "s" : ""}
                     </button>
@@ -437,7 +437,7 @@ export default function PromocionAlumnos() {
                   <button
                     onClick={() => setConfirmando("grado")}
                     disabled={periodoActual?.activo === 0}
-                    style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 6, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
+                    style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
                     onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(1.1)")}
                     onMouseLeave={(e) => (e.currentTarget.style.filter = "brightness(1)")}
                   >
@@ -448,7 +448,7 @@ export default function PromocionAlumnos() {
                   <button
                     onClick={() => setConfirmando("grado")}
                     disabled={periodoActual?.activo === 0}
-                    style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 6, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
+                    style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: 10, padding: "7px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", opacity: periodoActual?.activo === 0 ? 0.5 : 1 }}
                     onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(1.1)")}
                     onMouseLeave={(e) => (e.currentTarget.style.filter = "brightness(1)")}
                   >
@@ -546,7 +546,7 @@ export default function PromocionAlumnos() {
                           <button
                             onClick={() => { setIdIndividual(a.id_matricula); setConfirmando("individual"); }}
                             disabled={!a.puede_promover || periodoActual?.activo === 0}
-                            style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 5, padding: "4px 10px", fontSize: 12, fontWeight: 600, color: "#b91c1c", cursor: "pointer", opacity: (a.puede_promover && periodoActual?.activo !== 0) ? 1 : 0.4 }}
+                            style={{ background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 10, padding: "4px 10px", fontSize: 12, fontWeight: 600, color: "#b91c1c", cursor: "pointer", opacity: (a.puede_promover && periodoActual?.activo !== 0) ? 1 : 0.4 }}
                           >Egresar</button>
                         ) : (
                           <button
@@ -555,7 +555,7 @@ export default function PromocionAlumnos() {
                             style={{
                               background: sel ? "#2563eb" : "#eff6ff",
                               border: `1px solid ${sel ? "#1d4ed8" : "#93c5fd"}`,
-                              borderRadius: 5, padding: "4px 10px", fontSize: 12, fontWeight: 700,
+                              borderRadius: 10, padding: "4px 10px", fontSize: 12, fontWeight: 700,
                               color: sel ? "#fff" : "#1d4ed8", cursor: "pointer",
                               opacity: (a.puede_promover && periodoActual?.activo !== 0) ? 1 : 0.4,
                               transition: "all 0.15s"
@@ -692,7 +692,7 @@ export default function PromocionAlumnos() {
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button
                 onClick={() => { setConfirmando(null); }}
-                style={{ background: "#f3f4f6", border: "none", borderRadius: 7, padding: "9px 18px", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "#374151" }}
+                style={{ background: "#f3f4f6", border: "none", borderRadius: 10, padding: "9px 18px", fontSize: 14, fontWeight: 600, cursor: "pointer", color: "#374151" }}
                 disabled={loading}
               >
                 Cancelar
@@ -720,7 +720,7 @@ export default function PromocionAlumnos() {
                 disabled={loading}
                 style={{
                   background: (confirmando === "egreso" || (confirmando === "individual" && esUltimoGrado)) ? "#dc2626" : "#2563eb",
-                  color: "#fff", border: "none", borderRadius: 7, padding: "9px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer"
+                  color: "#fff", border: "none", borderRadius: 10, padding: "9px 20px", fontSize: 14, fontWeight: 600, cursor: "pointer"
                 }}
               >
                 {loading ? "Procesando..." : (confirmando === "egreso" || (confirmando === "individual" && esUltimoGrado)) ? "Sí, egresar" : "Confirmar Proceso"}
@@ -749,7 +749,7 @@ export default function PromocionAlumnos() {
           <div className="flex border-t border-slate-100 h-14">
             <button
               onClick={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
-              className={`flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${alertModal.type === "danger" ? "text-rose-600" : "text-blue-600"
+              className={`rounded-[10px] flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${alertModal.type === "danger" ? "text-rose-600" : "text-blue-600"
                 }`}
             >
               Aceptar

@@ -438,7 +438,7 @@ export default function CuotasProgramar() {
             {modalConfig.showCancel && (
               <button
                 onClick={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
-                className="flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
+                className="rounded-[10px] flex-1 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-colors uppercase tracking-widest border-r border-slate-100"
               >
                 {modalConfig.cancelText || "Cancelar"}
               </button>
@@ -448,7 +448,7 @@ export default function CuotasProgramar() {
                 if (modalConfig.onConfirm) modalConfig.onConfirm();
                 setModalConfig(prev => ({ ...prev, isOpen: false }));
               }}
-              className={`flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
+              className={`rounded-[10px] flex-1 text-sm font-bold hover:bg-slate-50 transition-colors uppercase tracking-widest ${modalConfig.type === "danger" ? "text-rose-600" : "text-blue-600"
                 }`}
             >
               {modalConfig.confirmText || "Aceptar"}
